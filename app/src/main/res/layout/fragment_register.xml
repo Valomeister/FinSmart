@@ -28,16 +28,26 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
         android:background="@drawable/edit_text_border"
-        android:hint="Логин"
+        android:hint="Номер телефона"
         android:minHeight="48dp"
         android:padding="8dp"
         app:fontFamily="@font/roboto_medium" />
+
+    <TextView
+        android:id="@+id/loginError"
+        android:layout_width="383dp"
+        android:layout_height="wrap_content"
+        android:text="Неизвестная ошибка!"
+        android:textColor="@android:color/holo_red_dark"
+        android:visibility="invisible"
+        android:paddingTop="0dp"
+        android:paddingBottom="0dp"/>
 
     <EditText
         android:id="@+id/passwordEditText"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="19dp"
+        android:layout_marginTop="3dp"
         android:background="@drawable/edit_text_border"
         android:hint="Пароль"
         android:inputType="textPassword"
@@ -45,11 +55,21 @@
         android:padding="8dp"
         app:fontFamily="@font/roboto_medium" />
 
+    <TextView
+        android:id="@+id/passwordError"
+        android:layout_width="383dp"
+        android:layout_height="wrap_content"
+        android:text="Неизвестная ошибка!"
+        android:textColor="@android:color/holo_red_dark"
+        android:visibility="invisible"
+        android:paddingTop="0dp"
+        android:paddingBottom="0dp"/>
+
     <EditText
         android:id="@+id/confirmPasswordEditText"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="19dp"
+        android:layout_marginTop="3dp"
         android:background="@drawable/edit_text_border"
         android:hint="Повторите пароль"
         android:inputType="textPassword"
@@ -57,7 +77,15 @@
         android:padding="8dp"
         app:fontFamily="@font/roboto_medium" />
 
-
+    <TextView
+        android:id="@+id/confirmPasswordError"
+        android:layout_width="383dp"
+        android:layout_height="wrap_content"
+        android:text="Неизвестная ошибка!"
+        android:textColor="@android:color/holo_red_dark"
+        android:visibility="invisible"
+        android:paddingTop="0dp"
+        android:paddingBottom="0dp"/>
 
     <CheckBox
         android:id="@+id/termsCheckbox"
@@ -66,13 +94,13 @@
         android:text="Принимаю условия пользовательского соглашения"
         android:textColor="#4D4D4D"
         android:textSize="16sp"
-        android:layout_marginTop="12dp"/>
+        android:layout_marginTop="0dp"/>
 
     <Button
         android:id="@+id/registerButton"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
+        android:layout_marginTop="21dp"
         android:background="@drawable/button_background"
         android:padding="12dp"
         android:text="Зарегистрироваться"
