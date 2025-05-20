@@ -52,13 +52,13 @@ public class LoginFragment extends Fragment {
             boolean phoneOK = false;
             boolean passwordOK = false;
 
-            String regexPhone = "^(\\+7|8)\\d{10}$";
+
             // проверка поля номера телефона на пустоту
             if (phone.isEmpty()) {
                 loginErrorText.setVisibility(View.VISIBLE);
                 loginErrorText.setText("Обязательное поле!");
             }
-            // Проверяем что телефон не занят
+            // Проверяем что телефон зарегистрирован
             else if (!dbHelper.isPhoneExists(phone)) {
                 loginErrorText.setVisibility(View.VISIBLE);
                 loginErrorText.setText("Номер не зарегистрирован!");
@@ -93,6 +93,14 @@ public class LoginFragment extends Fragment {
                 Intent intent = new Intent(requireActivity(), MainActivity.class);
                 startActivity(intent);
             }
+        });
+
+        forgotPasswordTextView.setOnClickListener(v -> {
+            // Переключаем на ResetPasswordFragment
+            requireActivity().getSupportFragmentManager()
+                    .beginTransaction()
+                    .replace(R.id.fragment_container, new ResetPasswordFragment())
+                    .commit();
         });
 
         // Обработка нажатия на "Зарегистрироваться"

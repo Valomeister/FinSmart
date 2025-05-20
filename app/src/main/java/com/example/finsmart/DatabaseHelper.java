@@ -86,4 +86,22 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         cursor.close();
         return exists;
     }
+
+    public boolean updateUserPassword(String phone, String newPassword) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        String newHashedPassword = HashUtils.sha256(newPassword);
+
+        ContentValues values = new ContentValues();
+        values.put(COLUMN_PASSWORD_HASH, newHashedPassword);
+
+        // Обновляем запись где phone равен указанному номеру
+        int rowsAffected = db.update(
+                TABLE_USERS,
+                values,
+                COLUMN_PHONE + " = ?",
+                new String[]{phone}
+        );
+
+        return rowsAffected > 0;
+    }
 }

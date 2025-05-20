@@ -33,7 +33,7 @@ public class RegisterFragment extends Fragment {
         EditText confirmPasswordEditText = view.findViewById(R.id.confirmPasswordEditText);
         CheckBox termsCheckbox = view.findViewById(R.id.termsCheckbox);
         Button registerButton = view.findViewById(R.id.registerButton);
-        TextView loginTextView = view.findViewById(R.id.loginTextView);
+        TextView loginTextView = view.findViewById(R.id.loginLinkTextView);
 
         // Костыль, не знаю как это надо делать по-нормальному...
         termsCheckbox.setOnClickListener(v -> {
