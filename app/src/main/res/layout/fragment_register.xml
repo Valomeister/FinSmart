@@ -94,7 +94,7 @@
         android:text="Принимаю условия пользовательского соглашения"
         android:textColor="#4D4D4D"
         android:textSize="16sp"
-        android:layout_marginTop="0dp"/>
+        android:layout_marginTop="0dp" />
 
     <Button
         android:id="@+id/registerButton"

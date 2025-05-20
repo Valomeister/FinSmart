@@ -35,6 +35,15 @@ public class RegisterFragment extends Fragment {
         Button registerButton = view.findViewById(R.id.registerButton);
         TextView loginTextView = view.findViewById(R.id.loginTextView);
 
+        // Костыль, не знаю как это надо делать по-нормальному...
+        termsCheckbox.setOnClickListener(v -> {
+            if (!termsCheckbox.isChecked()) {
+                termsCheckbox.setButtonTintList(ColorStateList.valueOf(Color.parseColor("#4D4D4D")));
+            } else {
+                termsCheckbox.setButtonTintList(ColorStateList.valueOf(Color.parseColor("#7D7AFF")));
+            }
+        });
+
         // --- Добавляем обработчик для кнопки регистрации ---
         registerButton.setOnClickListener(v -> {
             // Считываем данные из полей
@@ -119,7 +128,6 @@ public class RegisterFragment extends Fragment {
                 termsCheckbox.setButtonTintList(ColorStateList.valueOf(Color.RED));
             }
             else {
-                termsCheckbox.setButtonTintList(ColorStateList.valueOf(Color.parseColor("#4D4D4D")));
                 termsCheckboxOK = true;
             }
 
