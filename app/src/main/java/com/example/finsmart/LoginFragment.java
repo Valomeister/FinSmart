@@ -45,10 +45,6 @@ public class LoginFragment extends Fragment {
             // Хэшируем пароль (если нужно)
             String passwordHash = HashUtils.sha256(password);
 
-            // Логируем введённые данные
-            Log.d("my_test", "Телефон: " + phone);
-            Log.d("my_test", "Пароль (hash): " + passwordHash);
-
 
             dbHelper = new DatabaseHelper(requireContext());
 

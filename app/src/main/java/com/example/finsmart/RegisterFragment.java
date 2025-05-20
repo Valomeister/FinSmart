@@ -45,10 +45,6 @@ public class RegisterFragment extends Fragment {
             // Хэшируем пароль (если нужно)
             String passwordHash = HashUtils.sha256(password);
 
-            // Логируем введённые данные
-            Log.d("my_test_register", "Телефон: " + phone);
-            Log.d("my_test_register", "Пароль (hash): " + passwordHash);
-
             dbHelper = new DatabaseHelper(requireContext());
 
             TextView loginErrorText = view.findViewById(R.id.loginError);
@@ -128,7 +124,7 @@ public class RegisterFragment extends Fragment {
             }
 
             if (phoneOK && passwordOK && confirmPasswordOK && termsCheckboxOK) {
-                dbHelper.registerUser(phone, passwordHash);
+                dbHelper.registerUser(phone, password);
                 Toast.makeText(getActivity(), "Вы создали учетную запись", Toast.LENGTH_SHORT).show();
                 switchToLoginFragment();
 
