@@ -9,7 +9,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -31,7 +30,6 @@ public class LoginFragment extends Fragment {
         // Находим элементы
         EditText loginEditText = view.findViewById(R.id.loginEditText);
         EditText passwordEditText = view.findViewById(R.id.passwordEditText);
-        CheckBox rememberMeCheckbox = view.findViewById(R.id.rememberMeCheckbox);
         Button loginButton = view.findViewById(R.id.loginButton);
         TextView forgotPasswordTextView = view.findViewById(R.id.forgotPasswordTextView);
         TextView registerTextView = view.findViewById(R.id.registerLinkTextView);

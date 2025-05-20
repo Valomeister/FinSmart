@@ -65,33 +65,15 @@
         android:paddingTop="0dp"
         android:paddingBottom="0dp"/>
 
-    <LinearLayout
-        android:layout_width="match_parent"
+
+    <TextView
+        android:id="@+id/forgotPasswordTextView"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="0dp"
-        android:orientation="horizontal">
+        android:layout_gravity="start|center_vertical"
+        android:text="Забыли пароль?"
+        android:textColor="@color/linkColor" />
 
-        <CheckBox
-            android:id="@+id/rememberMeCheckbox"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Запомнить меня"
-            android:textColor="#4D4D4D" />
-        <!-- Невидимый View, который займёт всё оставшееся пространство -->
-        <View
-            android:layout_width="0dp"
-            android:layout_height="0dp"
-            android:layout_weight="1" />
-
-        <TextView
-            android:id="@+id/forgotPasswordTextView"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="end|center_vertical"
-            android:layout_marginStart="16dp"
-            android:text="Забыли пароль?"
-            android:textColor="@color/linkColor" />
-    </LinearLayout>
 
     <Button
         android:id="@+id/loginButton"
