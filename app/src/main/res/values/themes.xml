@@ -21,6 +21,9 @@
         <!-- Цвет текста активного CheckBox -->
         <item name="colorControlActivated">#00FF00</item>
 
+        <!-- Цвет заднего фона -->
+        <item name="android:windowBackground">#FFFFFF</item>
+
     </style>
 
     <style name="Theme.FinSmart" parent="Base.Theme.FinSmart" />

@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    tools:context=".HomePageFragment">
+
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="40dp">
+        <TextView
+            android:id="@+id/titleTextView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Стоимость портфеля в "
+            android:textSize="24sp"
+            app:fontFamily="@font/roboto_medium"/>
+        <TextView
+            android:id="@+id/titleButtonTextView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="рублях"
+            android:textSize="24sp"
+            app:fontFamily="@font/roboto_medium"
+            android:textColor="#7D7AFF" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="80dp">
+        <TextView
+            android:id="@+id/subtitleTextView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="22 321₽ (1,5%)"
+            android:textSize="14sp"
+            app:fontFamily="@font/roboto_medium"
+            android:textColor="#59C736"
+            android:background="@drawable/green_backgorund"
+            android:padding="4dp"
+            android:paddingStart="8dp"
+            android:paddingEnd="8dp"
+            android:layout_marginEnd="8px"/>
+        <TextView
+            android:id="@+id/subtitleButtonTextView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="за все время"
+            android:textSize="15sp"
+            app:fontFamily="@font/roboto_medium"
+            android:textColor="#7D7AFF"/>
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:weightSum="100"
+        android:layout_marginTop="130dp">
+
+        <View
+            android:layout_width="0dp"
+            android:layout_height="1dp"
+            android:layout_weight="18" />
+
+
+        <com.github.mikephil.charting.charts.PieChart
+            android:id="@+id/pieChart"
+            android:layout_width="1dp"
+            android:layout_height="300dp"
+            android:layout_weight="64">
+        </com.github.mikephil.charting.charts.PieChart>
+
+        <View
+            android:layout_width="0dp"
+            android:layout_height="1dp"
+            android:layout_weight="18" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/legend_container"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="8dp"
+        android:layout_marginTop="500dp"/>
+
+</FrameLayout>
