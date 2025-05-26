@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ScrollView
     xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:fillViewport="true">
-    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:tools="http://schemas.android.com/tools"
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        xmlns:app="http://schemas.android.com/apk/res-auto"
         tools:context=".HomePageFragment"
         android:orientation="vertical"
         android:background="#F0EAFF">
@@ -55,7 +55,7 @@
                     android:textSize="14sp"
                     app:fontFamily="@font/roboto_medium"
                     android:textColor="#59C736"
-                    android:background="@drawable/green_backgorund"
+                    android:background="@drawable/green_background"
                     android:padding="4dp"
                     android:paddingStart="8dp"
                     android:paddingEnd="8dp"
@@ -73,9 +73,9 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
                 android:orientation="horizontal"
-                android:weightSum="100"
-                android:layout_marginTop="20dp">
+                android:weightSum="100">
 
                 <View
                     android:layout_width="0dp"
@@ -87,13 +87,12 @@
                     android:id="@+id/pieChart"
                     android:layout_width="1dp"
                     android:layout_height="300dp"
-                    android:layout_weight="64">
-                </com.github.mikephil.charting.charts.PieChart>
+                    android:layout_weight="64"></com.github.mikephil.charting.charts.PieChart>
 
                 <View
                     android:layout_width="0dp"
                     android:layout_height="1dp"
-                    android:layout_weight="18"/>
+                    android:layout_weight="18" />
             </LinearLayout>
 
             <LinearLayout
@@ -102,8 +101,9 @@
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
                 android:layout_marginTop="20dp"
+                android:layout_marginBottom="40dp"
                 android:paddingStart="16dp"
-                android:paddingEnd="16dp"/>
+                android:paddingEnd="16dp" />
         </LinearLayout>
 
         <LinearLayout
@@ -123,19 +123,64 @@
                     android:id="@+id/section2TitleTextView"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Динамика стоимости портфеля за "
-                    android:textSize="16sp"
+                    android:text="Динамика портфеля за "
+                    android:textSize="24sp"
                     app:fontFamily="@font/roboto_medium"/>
                 <TextView
                     android:id="@+id/section2TitleButtonTextView"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="1 год"
-                    android:textSize="16sp"
+                    android:textSize="24sp"
                     app:fontFamily="@font/roboto_medium"
                     android:textColor="#7D7AFF" />
             </LinearLayout>
             <!-- TODO: Сделать как в телеге (цена, динамика, надпись) -->
+            <TextView
+                android:id="@+id/section2Price"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="1 623 131 ₽"
+                android:textSize="20sp"
+                app:fontFamily="@font/roboto"
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="32dp"
+                android:textStyle="bold"/>
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginTop="4dp"
+                android:layout_marginStart="16dp"
+                android:layout_marginEnd="16dp">
+
+                <TextView
+                    android:id="@+id/section2PriceChange"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textColor="#59C736"
+                    android:background="@drawable/green_background"
+                    android:text="22 321 ₽ (1,5%)"
+                    android:textSize="14sp"
+                    android:padding="4dp"
+                    android:paddingStart="8dp"
+                    android:paddingEnd="8dp"
+                    app:fontFamily="@font/roboto_medium"
+                    android:layout_gravity="center_vertical"/>
+                <TextView
+                    android:id="@+id/section2PriceDate"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="25.02.2007"
+                    android:textSize="14sp"
+                    android:padding="4dp"
+                    android:paddingStart="8dp"
+                    android:paddingEnd="8dp"
+                    app:fontFamily="@font/roboto_medium"
+                    android:layout_gravity="center_vertical"
+                    android:textColor="#5D5D5D"/>
+            </LinearLayout>
             <com.github.mikephil.charting.charts.LineChart
                 android:id="@+id/lineChart"
                 android:layout_width="match_parent"
@@ -149,7 +194,7 @@
                 android:padding="0dp"
                 android:paddingStart="16dp"
                 android:paddingEnd="16dp"
-                android:layout_marginTop="16dp">
+                android:layout_marginTop="24dp">
 
                 <Button
                     android:id="@+id/btn1D"

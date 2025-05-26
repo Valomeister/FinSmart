@@ -1,5 +1,7 @@
 package com.example.finsmart;
 
+import android.animation.Animator;
+import android.animation.AnimatorListenerAdapter;
 import android.content.Context;
 import android.graphics.Color;
 import android.graphics.Typeface;
@@ -9,6 +11,8 @@ import android.os.Bundle;
 import androidx.core.content.res.ResourcesCompat;
 import androidx.fragment.app.Fragment;
 
+import android.os.Handler;
+import android.os.Looper;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -17,6 +21,7 @@ import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.github.mikephil.charting.animation.Easing;
 import com.github.mikephil.charting.charts.LineChart;
 import com.github.mikephil.charting.charts.PieChart;
 import com.github.mikephil.charting.components.Legend;
@@ -32,6 +37,7 @@ import com.github.mikephil.charting.data.PieDataSet;
 import com.github.mikephil.charting.data.PieEntry;
 import com.github.mikephil.charting.formatter.ValueFormatter;
 import com.github.mikephil.charting.highlight.Highlight;
+import com.github.mikephil.charting.interfaces.datasets.IDataSet;
 import com.github.mikephil.charting.listener.OnChartValueSelectedListener;
 import com.github.mikephil.charting.utils.ColorTemplate;
 
@@ -39,7 +45,9 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -48,6 +56,8 @@ public class HomePageFragment extends Fragment {
     List<Entry> lineChartDataAllTime;
     LineDataSet fullDataSet;
     LineChart lineChart;
+    private boolean isAnimationRunning = false;
+    View view;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -55,7 +65,7 @@ public class HomePageFragment extends Fragment {
 
 
         // Inflate the layout for this fragment
-        View view = inflater.inflate(R.layout.fragment_home_page, container, false);
+        view = inflater.inflate(R.layout.fragment_home_page, container, false);
 
         // Круговая диаграмма
         // 1. Получаем данные из БД (пример)
@@ -76,9 +86,6 @@ public class HomePageFragment extends Fragment {
         lineChartDataAllTime = lineChartData; // запоминаем полный набор данных
         // запоминаем полный датасет
         fullDataSet = new LineDataSet(lineChartDataAllTime, "Full dataset");
-        fullDataSet.setColor(Color.parseColor("#7D7AFF"));
-        fullDataSet.setLineWidth(2f);
-        fullDataSet.setDrawCircles(false);
 
         // 2. Настраиваем диаграмму
         lineChart = view.findViewById(R.id.lineChart);
@@ -98,14 +105,20 @@ public class HomePageFragment extends Fragment {
             button.setOnClickListener(v -> onTimeRangeClicked(button));
         }
 
-        // Установка кнопки "Все" как активной по умолчанию
-        setActiveButton(view.findViewById(R.id.btnAllTime));
+        // Изначальная подгрузка графика в интервале "1Г"
+        onTimeRangeClicked(view.findViewById(R.id.btn1Y));
 
         return view;
     }
 
     private void onTimeRangeClicked(Button selectedButton) {
-        setActiveButton(selectedButton);
+        boolean animateChartUpdate = true;
+        // Если выбран активный интервал
+        if (selectedButton.isSelected()) {
+            animateChartUpdate = false;
+        } else {
+            setActiveButton(selectedButton);
+        }
 
         int numOfDays = 0;
         int selectedButtonId = selectedButton.getId();
@@ -128,7 +141,7 @@ public class HomePageFragment extends Fragment {
 
         List<Entry> lastNEntries = lineChartDataAllTime.subList(lineChartDataAllTime.size() - numOfDays, lineChartDataAllTime.size());
 
-        updateLineChart(lineChart, lastNEntries);
+        updateLineChart(lineChart, lastNEntries, animateChartUpdate);
     }
 
     private void setActiveButton(Button activeButton) {
@@ -136,13 +149,6 @@ public class HomePageFragment extends Fragment {
             boolean isSelected = button == activeButton;
             button.setSelected(isSelected);
 
-            // Программное изменение стиля (альтернатива селекторам)
-            /*
-            button.setBackgroundTintList(ColorStateList.valueOf(
-                isSelected ? Color.parseColor("#7D7AFF") : Color.WHITE
-            ));
-            button.setTextColor(isSelected ? Color.WHITE : Color.parseColor("#4D4D4D"));
-            */
         }
     }
 
@@ -307,34 +313,37 @@ public class HomePageFragment extends Fragment {
 
         // Создание набора данных
         LineDataSet dataSet = new LineDataSet(entries, "Стоимость портфеля");
-        dataSet.setColor(Color.parseColor("#7D7AFF"));
-        dataSet.setValueTextColor(Color.BLACK);
-        dataSet.setDrawCircles(false); // Отключает кружки
-        dataSet.setDrawValues(false);  // Дополнительно отключает подписи значений
-        dataSet.setLineWidth(2f);
+        fixLineDataSetFormatting(dataSet);
 
         // Настройка графика
         LineData lineData = new LineData(dataSet);
         lineChart.setData(lineData);
         lineChart.getDescription().setEnabled(false);
+        lineChart.setAutoScaleMinMaxEnabled(true);
+        lineChart.getLegend().setEnabled(false);
+        lineChart.setExtraOffsets(0, 0, 0, 5); // left, top, right, bottom
         // Отключаем сетку для оси X
         XAxis xAxis = lineChart.getXAxis();
         // Отключаем сетку для левой оси Y
         YAxis leftAxis = lineChart.getAxisLeft();
-        // Отключаем сетку для правой оси Y (если она видима)
         YAxis rightAxis = lineChart.getAxisRight();
-        rightAxis.setDrawGridLines(false);
-        rightAxis.setEnabled(true); // Дополнительно можно полностью отключить правую ось
+        rightAxis.setDrawGridLines(true);
+        rightAxis.setGridColor(Color.parseColor("#DDDDDD"));
+        rightAxis.setGridLineWidth(1f);
+        rightAxis.setDrawAxisLine(false);
+        rightAxis.setTextSize(14f);
+        rightAxis.setValueFormatter(new LineChartAxisValueFormatter());
         leftAxis.setDrawGridLines(false);
-        leftAxis.setEnabled(false); // Дополнительно можно полностью отключить правую ось
+        leftAxis.setEnabled(false);
         xAxis.setDrawGridLines(false);
         xAxis.setPosition(XAxis.XAxisPosition.BOTTOM); // Подписи снизу
         xAxis.setAvoidFirstLastClipping(true);
-        xAxis.setLabelCount(2, true); // Примерно 2 меток с равными интервалами
+        xAxis.setTextSize(14f);
+        xAxis.setLabelCount(2, true); // граничные метки графика
         xAxis.setValueFormatter(new ValueFormatter() {
             @Override
             public String getFormattedValue(float value) {
-                // value - это Entry.x (в вашем случае entries.size())
+                // value - это Entry.x (в нашем случае entries.size())
                 int index = (int) value;
                 if (index >= 0 && index < entries.size()) {
                     Entry entry = entries.get(index);
@@ -343,15 +352,28 @@ public class HomePageFragment extends Fragment {
                 return "";
             }
         });
-        lineChart.setAutoScaleMinMaxEnabled(true);
-        lineChart.getLegend().setEnabled(false);
 
+        // настройка разделения графика при нажатии
+        updateLineChartSelectedListener(lineChart, entries);
+
+        lineChart.animateX(1000); // Анимация
+        lineChart.invalidate(); // Обновление
+
+        // установка данных над графиком
+        updateDataAboveLineChart(entries.size() - 1, entries);
+    }
+
+    private void updateLineChartSelectedListener(LineChart lineChart, List<Entry> entries) {
         lineChart.setOnChartValueSelectedListener(new OnChartValueSelectedListener() {
             @Override
             public void onValueSelected(Entry e, Highlight h) {
-
                 // Сбрасываем визуальное выделение
                 lineChart.highlightValue(null);
+                // TODO: 26.05.2025 обводить кружочком выбранный data point
+
+                if (isAnimationRunning) {
+                    return;
+                }
 
                 // Находим индекс точки, по которой произошло нажатие
                 int splitIndex = -1;
@@ -365,7 +387,7 @@ public class HomePageFragment extends Fragment {
                 if (splitIndex == -1) return;
 
                 // Разделяем данные на две части
-                List<Entry> leftEntries = entries.subList(0, splitIndex);
+                List<Entry> leftEntries = entries.subList(0, splitIndex + 1);
                 List<Entry> rightEntries = entries.subList(splitIndex, entries.size());
 
                 // Левый DataSet (цветной)
@@ -373,12 +395,15 @@ public class HomePageFragment extends Fragment {
                 leftDataSet.setColor(Color.parseColor("#7D7AFF"));
                 leftDataSet.setLineWidth(2f);
                 leftDataSet.setDrawCircles(false);
+                leftDataSet.setDrawValues(false); // Отключает все числовые значения на линиях
 
                 // Правый DataSet (серый)
                 LineDataSet rightDataSet = new LineDataSet(rightEntries, "Inactive");
                 rightDataSet.setColor(Color.GRAY);
                 rightDataSet.setLineWidth(2f);
                 rightDataSet.setDrawCircles(false);
+                rightDataSet.setDrawValues(false); // Отключает все числовые значения на линиях
+
 
                 // Обновляем данные графика
                 LineData newData = new LineData(leftDataSet, rightDataSet);
@@ -391,46 +416,139 @@ public class HomePageFragment extends Fragment {
                 lineChart.setPinchZoom(false); // Двойное масштабирование щипком
 
                 // Можно отключить отдельно по осям:
-                lineChart.setDragXEnabled(false); // Только горизонтальная прокрутка
+                lineChart.setDragXEnabled(false);
                 lineChart.setDragYEnabled(false);
                 lineChart.invalidate();
 
+                // обновляем данные цены над графиком
+                TextView section2PriceTextView = view.findViewById(R.id.section2Price);
+                Entry selectedEntry = entries.get(splitIndex);
+                float selectedPrice = selectedEntry.getY();
+                String formattedPrice = String.format("%,.0f ₽", selectedPrice)
+                        .replace(',', ' ');
+                section2PriceTextView.setText(formattedPrice);
 
+                // обновляем данные изменения цены над графиком
+                TextView section2PriceChangeTextView = view.findViewById(R.id.section2PriceChange);
+                Entry firstEntry = entries.get(0);
+                float firstPrice = firstEntry.getY();
+                float priceDelta = selectedPrice - firstPrice;
+                float percentDelta = priceDelta / firstPrice * 100;
+                String trendSymbol = "+";
+                if (priceDelta < 0) {
+                    priceDelta *= -1;
+                    percentDelta *= -1;
+                    section2PriceChangeTextView.setBackgroundResource(R.drawable.red_background);
+                    section2PriceChangeTextView.setTextColor(Color.parseColor("#DB3B3B"));
+                    trendSymbol = "-";
+                } else {
+                    section2PriceChangeTextView.setBackgroundResource(R.drawable.green_background);
+                    section2PriceChangeTextView.setTextColor(Color.parseColor("#59C736"));
+                }
+                String formattedPriceDelta = String.format("%,.0f ₽", priceDelta)
+                        .replace(',', ' ');
+                String formattedPercentDelta = String.format("%.1f%%", percentDelta)
+                        .replace('.', ',');;
+                String combinedDelta = String.format("%s %s ( %s )",
+                        trendSymbol, formattedPercentDelta, formattedPriceDelta);
+                section2PriceChangeTextView.setText(combinedDelta);
+
+                // обновляем дату над графиком
+                TextView section2PriceDateTextView = view.findViewById(R.id.section2PriceDate);
+                String selectedDate = (String)selectedEntry.getData();
+                section2PriceDateTextView.setText(selectedDate);
+
+                // обновление данных над графиком
+                updateDataAboveLineChart(splitIndex, entries);
 
             }
+
 
             @Override
             public void onNothingSelected() {
                 // Возвращаем исходный график при отмене выбора
-
-
+                LineDataSet fullDataSet = new LineDataSet(entries, "Active");
+                fixLineDataSetFormatting(fullDataSet);
                 lineChart.setData(new LineData(fullDataSet));
                 lineChart.getXAxis().removeAllLimitLines(); // Удаляем линии разделения
                 lineChart.invalidate();
             }
         });
-
-        lineChart.animateX(1000); // Анимация
-        lineChart.invalidate(); // Обновление
     }
 
-    private void updateLineChart(LineChart lineChart, List<Entry> entries) {
+    public void updateDataAboveLineChart(int lastIndex, List<Entry> entries) {
+        // обновляем данные цены над графиком
+        TextView section2PriceTextView = view.findViewById(R.id.section2Price);
+        Entry lastEntry = entries.get(lastIndex);
+        float lastPrice = lastEntry.getY();
+        String formattedPrice = String.format("%,.0f ₽", lastPrice)
+                .replace(',', ' ');
+        section2PriceTextView.setText(formattedPrice);
+
+        // обновляем данные изменения цены над графиком
+        TextView section2PriceChangeTextView = view.findViewById(R.id.section2PriceChange);
+        Entry firstEntry = entries.get(0);
+        float firstPrice = firstEntry.getY();
+        float priceDelta = lastPrice - firstPrice;
+        float percentDelta = priceDelta / firstPrice * 100;
+        String trendSymbol = "+";
+        if (priceDelta < 0) {
+            priceDelta *= -1;
+            percentDelta *= -1;
+            section2PriceChangeTextView.setBackgroundResource(R.drawable.red_background);
+            section2PriceChangeTextView.setTextColor(Color.parseColor("#DB3B3B"));
+            trendSymbol = "-";
+        } else {
+            section2PriceChangeTextView.setBackgroundResource(R.drawable.green_background);
+            section2PriceChangeTextView.setTextColor(Color.parseColor("#59C736"));
+        }
+        String formattedPriceDelta = String.format("%,.0f ₽", priceDelta)
+                .replace(',', ' ');
+        String formattedPercentDelta = String.format("%.1f%%", percentDelta)
+                .replace('.', ',');;
+        String combinedDelta = String.format("%s %s ( %s )",
+                trendSymbol, formattedPercentDelta, formattedPriceDelta);
+        section2PriceChangeTextView.setText(combinedDelta);
+
+        // обновляем дату над графиком
+        TextView section2PriceDateTextView = view.findViewById(R.id.section2PriceDate);
+        String selectedDate = (String)lastEntry.getData();
+        section2PriceDateTextView.setText(selectedDate);
+    }
+
+    public void fixLineDataSetFormatting(LineDataSet lineDataSet) {
+        lineDataSet.setColor(Color.parseColor("#7D7AFF"));
+        lineDataSet.setValueTextColor(Color.BLACK);
+        lineDataSet.setDrawCircles(false); // Отключает кружки
+        lineDataSet.setDrawValues(false);  // Дополнительно отключает подписи значений
+        lineDataSet.setLineWidth(2f);
+    }
+    private void updateLineChart(LineChart lineChart, List<Entry> entries,
+                                 boolean animateChartUpdate) {
         LineDataSet newDataSet = new LineDataSet(entries, "Новые данные");
-        newDataSet.setColor(Color.parseColor("#7D7AFF"));
-        newDataSet.setValueTextColor(Color.BLACK);
-        newDataSet.setDrawCircles(false); // Отключает кружки
-        newDataSet.setDrawValues(false);  // Дополнительно отключает подписи значений
-        newDataSet.setLineWidth(2f);
+        // настройка нужного стиля (цвет и тд)
+        fixLineDataSetFormatting(newDataSet);
 
         // Получаем текущие данные
         LineData lineData = lineChart.getData();
         // Заменяем старый набор данных
-        lineData.removeDataSet(0); // Удаляем старый набор (индекс 0)
+        lineData.clearValues(); // Удаляем старый(е) набор(ы)
         lineData.addDataSet(newDataSet); // Добавляем новый
+        if (animateChartUpdate) {
+            // Обновляем график
+            isAnimationRunning = true;
+            lineChart.animateX(1000);
+            new Handler(Looper.getMainLooper()).postDelayed(() -> {
+                isAnimationRunning = false;
+            }, 1000); // Match duration of animation
+        }
 
-        // Обновляем график
-        lineChart.animateX(1000); // Анимация
-        lineChart.highlightValue(null); // TODO: 26.05.2025 при переключении веремени не сбрасывается разделение графика 
+        // обновление разделения графика при нажатии (entries у разных интервалов отличаются)
+        updateLineChartSelectedListener(lineChart, entries);
+
+        // обновление данных над графиком
+        updateDataAboveLineChart(entries.size() - 1, entries);
+
         lineChart.notifyDataSetChanged();
         lineChart.invalidate();
     }
