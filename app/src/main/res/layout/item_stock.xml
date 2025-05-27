@@ -5,7 +5,7 @@
     android:orientation="vertical"
     android:background="#FFFFFF"
     android:padding="24dp"
-    android:id="@+id/depositBody"
+    android:id="@+id/stockBody"
     xmlns:android="http://schemas.android.com/apk/res/android">
     <LinearLayout
         android:layout_width="match_parent"
@@ -13,18 +13,18 @@
         android:orientation="horizontal"
         android:layout_marginBottom="20dp">`
         <ImageView
-            android:id="@+id/bankIcon"
+            android:id="@+id/stockIcon"
             android:layout_width="36dp"
             android:layout_height="wrap_content"
             android:adjustViewBounds="true"
             android:scaleType="fitCenter"
-            app:srcCompat="@drawable/sber_icon"
+            app:srcCompat="@drawable/bank_default_icon"
             android:layout_marginEnd="14dp"/>
         <TextView
-            android:id="@+id/depositBankName"
+            android:id="@+id/stockName"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Сбер"
+            android:text="АО ВИМ Инвестиции"
             android:textSize="20sp"
             android:textStyle="bold"
             android:layout_gravity="center_vertical"/>
@@ -59,7 +59,7 @@
             android:textSize="16sp"/>
 
         <TextView
-            android:id="@+id/depositSum"
+            android:id="@+id/stockSum"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="290 000 ₽"
@@ -68,7 +68,7 @@
             android:textStyle="bold" />
     </LinearLayout>
 
-    <!-- Ставка -->
+    <!-- Стоимость штуки -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -80,19 +80,19 @@
             android:layout_width="0dp"
             android:layout_weight="1"
             android:layout_height="wrap_content"
-            android:text="Ставка"
-            android:textSize="16sp" />
+            android:text="Цена"
+            android:textSize="16sp"/>
 
         <TextView
-            android:id="@+id/depositInterest"
+            android:id="@+id/stockCurrentPrice"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="17%"
+            android:text="2 300 ₽"
             android:textSize="16sp"
             android:textStyle="bold" />
     </LinearLayout>
 
-    <!-- Дата заключения -->
+    <!-- Количество -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -104,19 +104,19 @@
             android:layout_width="0dp"
             android:layout_weight="1"
             android:layout_height="wrap_content"
-            android:text="Дата заключения"
-            android:textSize="16sp" />
+            android:text="Количество"
+            android:textSize="16sp"/>
 
         <TextView
-            android:id="@+id/depositDate"
+            android:id="@+id/stockQuantity"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="19.12.2024"
+            android:text="125 шт."
             android:textSize="16sp"
             android:textStyle="bold" />
     </LinearLayout>
 
-    <!-- Срок -->
+    <!-- Дата покупки -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -128,19 +128,19 @@
             android:layout_width="0dp"
             android:layout_weight="1"
             android:layout_height="wrap_content"
-            android:text="Срок"
-            android:textSize="16sp" />
+            android:text="Дата покупки"
+            android:textSize="16sp"/>
 
         <TextView
-            android:id="@+id/depositDuration"
+            android:id="@+id/stockDate"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="6 месяцев"
+            android:text="12.11.2022"
             android:textSize="16sp"
             android:textStyle="bold" />
     </LinearLayout>
 
-    <!-- Автопролонгация -->
+    <!-- Цена при покупке -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -152,19 +152,19 @@
             android:layout_width="0dp"
             android:layout_weight="1"
             android:layout_height="wrap_content"
-            android:text="Автопролонгация"
-            android:textSize="16sp" />
+            android:text="Цена покупки"
+            android:textSize="16sp"/>
 
         <TextView
-            android:id="@+id/depositProlongation"
+            android:id="@+id/stockPurchasePrice"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="есть"
+            android:text="1 812 ₽"
             android:textSize="16sp"
-            android:textStyle="bold"/>
+            android:textStyle="bold" />
     </LinearLayout>
 
-    <!-- Капитализация -->
+    <!-- Динамика -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -176,15 +176,16 @@
             android:layout_width="0dp"
             android:layout_weight="1"
             android:layout_height="wrap_content"
-            android:text="Капитализация"
-            android:textSize="16sp" />
+            android:text="Динамика"
+            android:textSize="16sp"/>
 
         <TextView
-            android:id="@+id/depositCapitalization"
+            android:id="@+id/stockDynamics"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="есть"
+            android:text="12,12%"
             android:textSize="16sp"
-            android:textStyle="bold"/>
+            android:textStyle="bold" />
     </LinearLayout>
+
 </LinearLayout>

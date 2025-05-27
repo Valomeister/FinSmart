@@ -62,7 +62,7 @@ public class HomePageFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-
+        // TODO: 28.05.2025 Сделать кликабельными фиол. надписи (за все вермя, в рублях и тд) 
 
         // Inflate the layout for this fragment
         view = inflater.inflate(R.layout.fragment_home_page, container, false);
@@ -273,6 +273,18 @@ public class HomePageFragment extends Fragment {
                     requireActivity().getSupportFragmentManager()
                             .beginTransaction()
                             .replace(R.id.fragment_container, new FundsFragment())
+                            .commit();
+                }
+            });
+        } else if (label.startsWith("Акции")) {
+            // Задаем обработчик клика на весь itemView
+            itemView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+
+                    requireActivity().getSupportFragmentManager()
+                            .beginTransaction()
+                            .replace(R.id.fragment_container, new StocksFragment())
                             .commit();
                 }
             });
