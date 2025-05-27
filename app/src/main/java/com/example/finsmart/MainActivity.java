@@ -1,6 +1,7 @@
 package com.example.finsmart;
 
 import android.os.Bundle;
+import android.widget.LinearLayout;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
@@ -12,7 +13,7 @@ import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 
 public class MainActivity extends AppCompatActivity {
-
+    public LinearLayout toolbarLinearLayout;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -23,6 +24,8 @@ public class MainActivity extends AppCompatActivity {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return insets;
         });
+
+        toolbarLinearLayout = findViewById(R.id.toolbar);
 
         // Загружаем начальный фрагмент (LoginFragment)
         if (savedInstanceState == null) {

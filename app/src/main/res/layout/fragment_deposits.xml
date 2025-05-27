@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:fillViewport="true"
+    tools:context=".DepositsFragment">
+
+    <LinearLayout
+        android:id="@+id/body"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:background="#F0EAFF">
+
+
+        <LinearLayout
+            android:id="@+id/depositContainer"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical">
+        </LinearLayout>
+
+        <Button
+            android:id="@+id/add_deposit_button"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/button_background"
+            android:backgroundTint="#7D70FF"
+            android:text="+ Добавить вклад"
+            android:textColor="#FFFFFF"
+            android:textSize="16sp"
+            android:padding="8dp"
+            android:layout_margin="16dp"
+            android:gravity="center" />
+    </LinearLayout>
+
+
+</ScrollView>

@@ -252,9 +252,22 @@ public class HomePageFragment extends Fragment {
         // Создаем элемент через LayoutInflater (лучший способ)
         View itemView = LayoutInflater.from(context).inflate(R.layout.item_legend, null);
 
+        if (label.startsWith("Вклады")) {
+            // Задаем обработчик клика на весь itemView
+            itemView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    // Здесь обрабатываем нажатие
+                    requireActivity().getSupportFragmentManager()
+                            .beginTransaction()
+                            .replace(R.id.fragment_container, new DepositsFragment())
+                            .commit();
+                }
+            });
+        }
+
         TextView labelView = itemView.findViewById(R.id.legend_label);
 
-//        labelView.setBackgroundColor(color);
         labelView.setText(label);
         Typeface typeface = ResourcesCompat.getFont(context, R.font.roboto_medium);
         labelView.setTypeface(typeface);
