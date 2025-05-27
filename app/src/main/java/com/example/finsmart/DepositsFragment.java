@@ -48,7 +48,7 @@ public class DepositsFragment extends Fragment {
         // вставляем свой toolbar
         View toolbarNavBack = inflater.inflate(R.layout.toolbar_nav_back, toolbarLinearLayout, false);
         TextView toolbarNavBackTab = toolbarNavBack.findViewById(R.id.tab);
-        toolbarNavBackTab.setText("Вклады");
+        toolbarNavBackTab.setText(tabName);
 
         ImageView arrowBack = toolbarNavBack.findViewById(R.id.arrowBack);
         arrowBack.setOnClickListener(v -> {
@@ -105,9 +105,9 @@ public class DepositsFragment extends Fragment {
 
         // Устанавливаем данные
         tvBankName.setText(deposit.getBankName());
-        NumberFormat format = NumberFormat.getInstance();
-        String sumFormatted = format.format(deposit.getAmount());
-        tvDepositSum.setText(sumFormatted);
+        String formattedAmount = String.format("%,.0f ₽", deposit.getAmount())
+                .replace(',', ' ');
+        tvDepositSum.setText(formattedAmount);
         tvInterest.setText(String.format("%.2f%%", deposit.getInterestRate()).
                 replace('.', ','));
         tvDate.setText(deposit.getStartDate());
@@ -141,11 +141,6 @@ public class DepositsFragment extends Fragment {
             depositBody.setLayoutParams(params);
         }
 
-        // Если нужно, можно добавить обработчик нажатия на весь элемент
-        item.setOnClickListener(v -> {
-            // Обработка клика по депозиту
-            Toast.makeText(requireContext(), "Выбран депозит: " + deposit.getBankName(), Toast.LENGTH_SHORT).show();
-        });
 
         return item;
     }

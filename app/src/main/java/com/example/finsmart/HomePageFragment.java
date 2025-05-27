@@ -257,10 +257,22 @@ public class HomePageFragment extends Fragment {
             itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    // Здесь обрабатываем нажатие
+
                     requireActivity().getSupportFragmentManager()
                             .beginTransaction()
                             .replace(R.id.fragment_container, new DepositsFragment())
+                            .commit();
+                }
+            });
+        } else if (label.startsWith("Фонды")) {
+            // Задаем обработчик клика на весь itemView
+            itemView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+
+                    requireActivity().getSupportFragmentManager()
+                            .beginTransaction()
+                            .replace(R.id.fragment_container, new FundsFragment())
                             .commit();
                 }
             });
