@@ -2,15 +2,16 @@ package com.example.finsmart;
 
 public class Stock {
     private String name;
+    private String symbol; // <-- новое поле
     private int quantity;
     private double purchasePrice;
     private double currentPrice;
     private String purchaseDate;
-    // TODO: 28.05.2025 добавить аббревиатуры (VTBR, MTSS и тд) и их отображение 
 
     // Конструктор
-    public Stock(String name, int quantity, double purchasePrice, double currentPrice, String purchaseDate) {
+    public Stock(String name, String symbol, int quantity, double purchasePrice, double currentPrice, String purchaseDate) {
         this.name = name;
+        this.symbol = symbol;
         this.quantity = quantity;
         this.purchasePrice = purchasePrice;
         this.currentPrice = currentPrice;
@@ -20,6 +21,10 @@ public class Stock {
     // Геттеры
     public String getStockName() {
         return name;
+    }
+
+    public String getSymbol() {
+        return symbol;
     }
 
     public int getQuantity() {

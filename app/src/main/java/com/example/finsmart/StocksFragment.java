@@ -1,5 +1,7 @@
 package com.example.finsmart;
 
+import static java.lang.Double.parseDouble;
+
 import android.content.Context;
 import android.os.Bundle;
 
@@ -9,10 +11,14 @@ import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import com.google.android.material.bottomsheet.BottomSheetDialog;
 
 import java.text.NumberFormat;
 import java.util.ArrayList;
@@ -23,20 +29,32 @@ import java.util.Map;
 public class StocksFragment extends Fragment {
 
     private HashMap<String, Integer> stockIconMap;
+    StockDBHelper dbHelper;
+    LinearLayout stockContainer;
+    View fragmentView;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        View view = inflater.inflate(R.layout.fragment_stocks, container, false);
+        fragmentView = inflater.inflate(R.layout.fragment_stocks, container, false);
 
         setToolbar(inflater, "Акции");
 
-        LinearLayout stockContainer = view.findViewById(R.id.stockContainer);
+        initStockIcons();
+
+        dbHelper = new StockDBHelper(requireContext());
+        // Для заполнения пустой БД небольшим набором данных:
+        dbHelper.populateInitialData();
+
+        stockContainer = fragmentView.findViewById(R.id.stockContainer);
         ArrayList<Stock> stocks =  getStocksFromDataBase();
         fillStockContainer(stocks, stockContainer);
 
-        return view;
+        Button addCurrencyButton = fragmentView.findViewById(R.id.add_stock_button);
+        addCurrencyButton.setOnClickListener(v -> showAddStockBottomSheet());
+
+        return fragmentView;
     }
 
     // TODO: 28.05.2025 в DepositsFragment и FundsFragment дублируется тело этого метода
@@ -69,29 +87,15 @@ public class StocksFragment extends Fragment {
     }
 
     ArrayList<Stock> getStocksFromDataBase() {
-        ArrayList<Stock> stocks = new ArrayList<>();
-
-        // Добавляем акции вручную с рандомизированными данными
-        stocks.add(new Stock("Банк ВТБ", 1512, 75.20,
-                93.59, "19.12.2024"));       // Прибыль
-        stocks.add(new Stock("ФосАгро", 1242, 80.45,
-                72.30, "15.11.2024"));       // Убыток
-        stocks.add(new Stock("МТС", 1421, 68.75,
-                81.00, "10.01.2025"));           // Прибыль
-        stocks.add(new Stock("ЛУКОЙЛ", 1012, 100.00,
-                90.00, "05.02.2025"));       // Убыток
-        stocks.add(new Stock("Сбер Банк", 1375, 77.32,
-                93.59, "19.12.2024"));     // Прибыль
-        stocks.add(new Stock("Яндекс", 1198, 85.00,
-                78.40, "01.03.2025"));        // Убыток
-        stocks.add(new Stock("Московская биржа", 1660, 70.00,
-                88.25, "25.12.2024")); // Прибыль
+        ArrayList<Stock> stocks = (ArrayList<Stock>) dbHelper.getAllStocks();
 
         return stocks;
     }
 
     private void fillStockContainer(ArrayList<Stock> stocks, LinearLayout stockContainer) {
-        initStockIcons();
+        // Удаляем все существующие элементы
+        stockContainer.removeAllViews();
+
         for (int i = 0; i < stocks.size(); i++) {
             boolean last = i == stocks.size() - 1;
             View stockItem = createStockItem(stocks.get(i), stockContainer, last);
@@ -110,6 +114,8 @@ public class StocksFragment extends Fragment {
         TextView tvStockDate = item.findViewById(R.id.stockDate);
         TextView tvStockPurchasePrice = item.findViewById(R.id.stockPurchasePrice);
         TextView tvStockDynamics = item.findViewById(R.id.stockDynamics);
+        ImageView ivCurrencyIcon = item.findViewById(R.id.stockIcon);
+        ImageView ivEditButton = item.findViewById(R.id.editButton);
 
         // Устанавливаем данные
         tvStockName.setText(stock.getStockName());
@@ -129,18 +135,20 @@ public class StocksFragment extends Fragment {
                 .replace(',', ' ');
         tvStockDynamics.setText(formattedDynamics);
 
+        // Обработчик кнопки редактирования
+        ivEditButton.setOnClickListener(v -> showEditStockBottomSheet(stock));
+
         // Логотип банка
-        // TODO: 28.05.2025 сделать их круглыми? 
-        ImageView stockIcon = item.findViewById(R.id.stockIcon);
+        // TODO: 28.05.2025 сделать их круглыми?
 
         // Получаем ID иконки из словаря по названию банка
         Integer iconResId = stockIconMap.get(stock.getStockName());
 
         if (iconResId != null) {
-            stockIcon.setImageResource(iconResId);
+            ivCurrencyIcon.setImageResource(iconResId);
         } else {
             // Если банк не найден в списке — ставим дефолтную иконку
-            stockIcon.setImageResource(R.drawable.bank_default_icon);
+            ivCurrencyIcon.setImageResource(R.drawable.bank_default_icon);
         }
 
 
@@ -157,6 +165,142 @@ public class StocksFragment extends Fragment {
         }
 
         return item;
+    }
+
+    private void showAddStockBottomSheet() {
+        BottomSheetDialog bottomSheetDialog = new BottomSheetDialog(requireContext());
+        View dialogView = getLayoutInflater().inflate(R.layout.dialog_add_stock, null);
+        bottomSheetDialog.setContentView(dialogView);
+
+        EditText editName = dialogView.findViewById(R.id.editName);
+        EditText editQuantity = dialogView.findViewById(R.id.editQuantity);
+        EditText editPurchaseDate = dialogView.findViewById(R.id.editPurchaseDate);
+        EditText editBuyInPrice = dialogView.findViewById(R.id.editBuyInPrice);
+        Button buttonAdd = dialogView.findViewById(R.id.buttonAdd);
+
+        buttonAdd.setOnClickListener(v -> {
+            String name = editName.getText().toString().trim();
+            String purchaseDate = editPurchaseDate.getText().toString().trim();
+
+            // Валидация данных
+            if (name.isEmpty() || purchaseDate.isEmpty() ) {
+                Toast.makeText(requireContext(), "Заполните все поля", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            int quantity = Integer.parseInt(editQuantity.getText().toString());
+            double buyInPrice = parseDouble(editBuyInPrice.getText().toString());
+
+            // Валидация данных
+            if (quantity <= 0 || buyInPrice <= 0) {
+                Toast.makeText(requireContext(), "Количество и цена должны быть больше нуля", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            String stockCode = StockSymbolMapper.getStockCode(name);
+            // Проверяем, существует ли уже такая крипта
+            if (dbHelper.getStockBySymbol(stockCode) != null) {
+                Toast.makeText(requireContext(), "Акция с таким названием уже есть", Toast.LENGTH_SHORT).show();
+                return;
+            }
+            // Добавляем в БД
+            dbHelper.addStock(new Stock(
+                    name,
+                    stockCode,
+                    quantity,
+                    buyInPrice,
+                    getCurrentPriceFromAPI(name), // Здесь можешь получить текущую цену из API
+                    purchaseDate
+            ));
+
+            // Обновляем UI
+            List<Stock> updatedList = dbHelper.getAllStocks();
+            fillStockContainer((ArrayList<Stock>) updatedList, stockContainer);
+
+            bottomSheetDialog.dismiss();
+        });
+
+        bottomSheetDialog.show();
+    }
+
+    private void showEditStockBottomSheet(Stock stock) {
+        BottomSheetDialog bottomSheetDialog = new BottomSheetDialog(requireContext());
+        View dialogView = getLayoutInflater().inflate(R.layout.dialog_edit_stock, null);
+        bottomSheetDialog.setContentView(dialogView);
+
+        TextView stockName = dialogView.findViewById(R.id.stockName);
+        EditText editQuantity = dialogView.findViewById(R.id.editQuantity);
+        EditText editPurchaseDate = dialogView.findViewById(R.id.editPurchaseDate);
+        EditText editBuyInPrice = dialogView.findViewById(R.id.editBuyInPrice);
+        Button buttonSave = dialogView.findViewById(R.id.buttonSave);
+        Button buttonDelete = dialogView.findViewById(R.id.buttonDelete);
+
+        // Заполняем поля текущими данными
+        stockName.setText(stock.getStockName());
+        editQuantity.setText(String.valueOf(stock.getQuantity()));
+        editBuyInPrice.setText(String.valueOf(stock.getPurchasePrice()));
+        editPurchaseDate.setText(stock.getPurchaseDate());
+
+        buttonSave.setOnClickListener(v -> {
+            String purchaseDate = editPurchaseDate.getText().toString().trim();
+            String quantityRaw = editQuantity.getText().toString();
+            String buyInPriceRaw = editBuyInPrice.getText().toString();
+
+            if (purchaseDate.isEmpty() ||
+                    quantityRaw.isEmpty() || buyInPriceRaw.isEmpty()) {
+                Toast.makeText(requireContext(), "Заполните все поля", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            int quantity = Integer.parseInt(quantityRaw);
+            double buyInPrice = parseDouble(buyInPriceRaw);
+
+            if (quantity <= 0 || buyInPrice <= 0) {
+                Toast.makeText(requireContext(), "Количество и цена должны быть больше нуля", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+
+            // Создаём новый объект Crypto с обновлёнными данными
+            Stock updatedStock = new Stock(
+                    stock.getStockName(),
+                    stock.getSymbol(), // TODO: 29.05.2025 типо CryptoSymbolMapper.generateSymbol
+                    quantity,
+                    buyInPrice,
+                    getCurrentPriceFromAPI(stock.getStockName()), // можно обновить через API, если нужно
+                    purchaseDate
+            );
+
+            // Обновляем запись в БД по ID
+            dbHelper.updateStock(updatedStock);
+
+            // Обновляем UI
+            List<Stock> updatedList = dbHelper.getAllStocks();
+            fillStockContainer((ArrayList<Stock>) updatedList, stockContainer);
+
+            bottomSheetDialog.dismiss();
+        });
+
+        // --- Логика удаления ---
+        buttonDelete.setOnClickListener(v -> {
+            // Удаляем из БД по коду валюты
+            dbHelper.deleteStock(stock.getSymbol());
+
+            // Удаляем из UI
+            List<Stock> updatedList = dbHelper.getAllStocks();
+            fillStockContainer((ArrayList<Stock>) updatedList, stockContainer);
+
+            bottomSheetDialog.dismiss();
+
+            // Показываем сообщение
+            Toast.makeText(requireContext(), "Акция удалена", Toast.LENGTH_SHORT).show();
+        });
+
+        bottomSheetDialog.show();
+    }
+
+    double getCurrentPriceFromAPI(String name) {
+        return 3.141592653979;
     }
 
     private void initStockIcons() {

@@ -60,7 +60,7 @@ public class CurrenciesFragment extends Fragment {
         return fragmentView;
     }
 
-    // TODO: 28.05.2025 в DepositsFragment и FundsFragment дублируется тело этого метода
+    // TODO: 28.05.2025 в DepositsFragment и FundsFragment дублируется тело этого методаa
     public void setToolbar(LayoutInflater inflater, String tabName) {
         MainActivity mainActivity = (MainActivity) requireActivity();
         LinearLayout toolbarLinearLayout = mainActivity.toolbarLinearLayout;
