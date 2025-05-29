@@ -251,7 +251,7 @@ public class HomePageFragment extends Fragment {
     private View createLegendItem(Context context, String label, int color) {
         // Создаем элемент через LayoutInflater (лучший способ)
         View itemView = LayoutInflater.from(context).inflate(R.layout.item_legend, null);
-
+        // TODO: 29.05.2025 улучшить логику запуска фрагментов (компактнее сделать) 
         if (label.startsWith("Вклады")) {
             // Задаем обработчик клика на весь itemView
             itemView.setOnClickListener(new View.OnClickListener() {
@@ -285,6 +285,20 @@ public class HomePageFragment extends Fragment {
                     requireActivity().getSupportFragmentManager()
                             .beginTransaction()
                             .replace(R.id.fragment_container, new StocksFragment())
+                            .commit();
+                }
+            });
+
+        } else if (label.startsWith("Валюта")) {
+            // TODO: 29.05.2025  переименовать "Валюта" в "Валюты"?
+            // Задаем обработчик клика на весь itemView
+            itemView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+
+                    requireActivity().getSupportFragmentManager()
+                            .beginTransaction()
+                            .replace(R.id.fragment_container, new CurrenciesFragment())
                             .commit();
                 }
             });

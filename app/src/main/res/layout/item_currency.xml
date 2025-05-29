@@ -5,7 +5,7 @@
     android:orientation="vertical"
     android:background="#FFFFFF"
     android:padding="24dp"
-    android:id="@+id/fundBody"
+    android:id="@+id/currencyBody"
     xmlns:android="http://schemas.android.com/apk/res/android">
     <LinearLayout
         android:layout_width="match_parent"
@@ -13,18 +13,18 @@
         android:orientation="horizontal"
         android:layout_marginBottom="20dp">`
         <ImageView
-            android:id="@+id/fundIcon"
+            android:id="@+id/currencyIcon"
             android:layout_width="36dp"
             android:layout_height="wrap_content"
             android:adjustViewBounds="true"
             android:scaleType="fitCenter"
-            app:srcCompat="@drawable/bank_default_icon"
+            app:srcCompat="@drawable/sber_icon"
             android:layout_marginEnd="14dp"/>
         <TextView
-            android:id="@+id/fundName"
+            android:id="@+id/currencyName"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="АО ВИМ Инвестиции"
+            android:text="Долллар США"
             android:textSize="20sp"
             android:textStyle="bold"
             android:layout_gravity="center_vertical"/>
@@ -59,7 +59,7 @@
             android:textSize="16sp"/>
 
         <TextView
-            android:id="@+id/fundSum"
+            android:id="@+id/currencyConvertedSum"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="290 000 ₽"
@@ -68,7 +68,8 @@
             android:textStyle="bold" />
     </LinearLayout>
 
-    <!-- Ставка -->
+
+    <!-- Курс -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -80,19 +81,19 @@
             android:layout_width="0dp"
             android:layout_weight="1"
             android:layout_height="wrap_content"
-            android:text="Ставка"
-            android:textSize="16sp" />
+            android:text="Курс"
+            android:textSize="16sp"/>
 
         <TextView
-            android:id="@+id/fundDynamics"
+            android:id="@+id/currencyExchangeRate"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="17 %"
+            android:text="82,22 ₽"
             android:textSize="16sp"
             android:textStyle="bold" />
     </LinearLayout>
 
-    <!-- Дата заключения -->
+    <!-- Количество -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -104,17 +105,91 @@
             android:layout_width="0dp"
             android:layout_weight="1"
             android:layout_height="wrap_content"
-            android:text="Дата вложения"
-            android:textSize="16sp" />
+            android:text="Объем"
+            android:textSize="16sp"/>
 
         <TextView
-            android:id="@+id/fundDate"
+            android:id="@+id/currencyQuantity"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="19.12.2024"
+            android:text="234,32 $"
             android:textSize="16sp"
             android:textStyle="bold" />
     </LinearLayout>
+
+    <!-- Дата покупке -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:layout_marginTop="8dp">
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="wrap_content"
+            android:text="Дата покупки"
+            android:textSize="16sp"/>
+
+        <TextView
+            android:id="@+id/currencyPurchaseDate"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="14.01.2025"
+            android:textSize="16sp"
+            android:textStyle="bold" />
+    </LinearLayout>
+
+    <!-- Курс при покупке -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:layout_marginTop="8dp">
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="wrap_content"
+            android:text="Курс покупки"
+            android:textSize="16sp"/>
+
+        <TextView
+            android:id="@+id/currencyPurchaseExchangeRate"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="99,32 ₽"
+            android:textSize="16sp"
+            android:textStyle="bold" />
+    </LinearLayout>
+
+    <!-- Динамика -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:layout_marginTop="8dp">
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="wrap_content"
+            android:text="Динамика"
+            android:textSize="16sp"/>
+
+        <TextView
+            android:id="@+id/currencyExchangeRateDynamics"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="-23,4 %"
+            android:textSize="16sp"
+            android:textStyle="bold" />
+    </LinearLayout>
+
+
 
 
 </LinearLayout>

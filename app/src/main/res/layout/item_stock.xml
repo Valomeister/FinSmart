@@ -183,7 +183,7 @@
             android:id="@+id/stockDynamics"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="12,12%"
+            android:text="12,12 %"
             android:textSize="16sp"
             android:textStyle="bold" />
     </LinearLayout>

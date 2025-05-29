@@ -87,7 +87,7 @@
             android:id="@+id/depositInterest"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="17%"
+            android:text="17 %"
             android:textSize="16sp"
             android:textStyle="bold" />
     </LinearLayout>
