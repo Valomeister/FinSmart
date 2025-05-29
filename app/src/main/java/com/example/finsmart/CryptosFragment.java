@@ -210,15 +210,23 @@ public class CryptosFragment extends Fragment {
 
         buttonAdd.setOnClickListener(v -> {
             String name = editName.getText().toString().trim();
-            double quantity = parseDouble(editQuantity.getText().toString());
             String purchaseDate = editPurchaseDate.getText().toString().trim();
-            double buyInPrice = parseDouble(editBuyInPrice.getText().toString());
 
             // Валидация данных
-            if (name.isEmpty() || quantity <= 0 || purchaseDate.isEmpty() || buyInPrice <= 0) {
+            if (name.isEmpty() || purchaseDate.isEmpty() ) {
                 Toast.makeText(requireContext(), "Заполните все поля", Toast.LENGTH_SHORT).show();
                 return;
             }
+
+            double quantity = parseDouble(editQuantity.getText().toString());
+            double buyInPrice = parseDouble(editBuyInPrice.getText().toString());
+
+            // Валидация данных
+            if (quantity <= 0 || buyInPrice <= 0) {
+                Toast.makeText(requireContext(), "Заполните все поля", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
 
             // Проверяем, существует ли уже такая крипта
             if (dbHelper.getCryptoByName(name) != null) {
