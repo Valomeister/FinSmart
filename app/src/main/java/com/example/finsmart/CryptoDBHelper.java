@@ -148,6 +148,38 @@ public class CryptoDBHelper extends SQLiteOpenHelper {
     }
 
     // Получить крипту по символу
+    public Crypto getCryptoByName(String name) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor cursor = db.query(TABLE_CRYPTO,
+                new String[]{
+                        COLUMN_SYMBOL,
+                        COLUMN_NAME,
+                        COLUMN_QUANTITY,
+                        COLUMN_BUY_IN_PRICE,
+                        COLUMN_CURRENT_PRICE,
+                        COLUMN_PURCHASE_DATE
+                },
+                COLUMN_SYMBOL + "=?",
+                new String[]{name},
+                null, null, null, null);
+
+        if (cursor != null && cursor.moveToFirst()) {
+            Crypto crypto = new Crypto(
+                    cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_NAME)),
+                    cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_SYMBOL)),
+                    cursor.getDouble(cursor.getColumnIndexOrThrow(COLUMN_QUANTITY)),
+                    cursor.getDouble(cursor.getColumnIndexOrThrow(COLUMN_BUY_IN_PRICE)),
+                    cursor.getDouble(cursor.getColumnIndexOrThrow(COLUMN_CURRENT_PRICE)),
+                    cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_PURCHASE_DATE))
+            );
+            cursor.close();
+            return crypto;
+        }
+        if (cursor != null) cursor.close();
+        return null;
+    }
+
+    // Получить крипту по названию
     public Crypto getCryptoBySymbol(String symbol) {
         SQLiteDatabase db = this.getReadableDatabase();
         Cursor cursor = db.query(TABLE_CRYPTO,
