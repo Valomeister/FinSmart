@@ -129,7 +129,7 @@ public class CryptosFragment extends Fragment {
         ImageView ivCryptoIcon = item.findViewById(R.id.cryptoIcon);
         ImageView ivEditButton = item.findViewById(R.id.editButton);
 
-// Устанавливаем данные
+        // Устанавливаем данные
         tvCryptoName.setText(crypto.getName());
 
         String formattedAmount = String.format("%,.0f ₽", crypto.getMarketValue())
@@ -150,7 +150,10 @@ public class CryptosFragment extends Fragment {
                 .replace(',', ' ').replace('.', ',');
         tvCryptoPurchaseExchangeRate.setText(formattedPurchasePrice);
 
-// Раскраска динамики: зелёный — рост, красный — падение
+        ivEditButton.setOnClickListener(v -> showEditCryptoBottomSheet(crypto));
+
+
+        // Раскраска динамики: зелёный — рост, красный — падение
         double returnPercentage = crypto.getReturnPercentage();
         String formattedDynamics = String.format("%,.2f %%", Math.abs(returnPercentage))
                 .replace(',', ' ');
@@ -163,7 +166,7 @@ public class CryptosFragment extends Fragment {
             tvCryptoExchangeRateDynamics.setTextColor(ContextCompat.getColor(requireContext(), android.R.color.holo_red_dark));
         }
 
-// Логотип криптовалюты
+        // Логотип криптовалюты
         Integer iconResId = cryptoIconMap.get(crypto.getSymbol()); // или getCode(), если используется код
 
         if (iconResId != null) {
@@ -223,7 +226,7 @@ public class CryptosFragment extends Fragment {
 
             // Валидация данных
             if (quantity <= 0 || buyInPrice <= 0) {
-                Toast.makeText(requireContext(), "Заполните все поля", Toast.LENGTH_SHORT).show();
+                Toast.makeText(requireContext(), "Количество и цена должны быть больше нуля", Toast.LENGTH_SHORT).show();
                 return;
             }
 
@@ -253,6 +256,67 @@ public class CryptosFragment extends Fragment {
 
         bottomSheetDialog.show();
     }
+
+    private void showEditCryptoBottomSheet(Crypto crypto) {
+        BottomSheetDialog bottomSheetDialog = new BottomSheetDialog(requireContext());
+        View dialogView = getLayoutInflater().inflate(R.layout.dialog_edit_crypto, null);
+        bottomSheetDialog.setContentView(dialogView);
+
+        EditText editName = dialogView.findViewById(R.id.editName);
+        EditText editQuantity = dialogView.findViewById(R.id.editQuantity);
+        EditText editPurchaseDate = dialogView.findViewById(R.id.editPurchaseDate);
+        EditText editBuyInPrice = dialogView.findViewById(R.id.editBuyInPrice);
+        Button buttonSave = dialogView.findViewById(R.id.buttonSave);
+
+        // Заполняем поля текущими данными
+        editName.setText(crypto.getName());
+        editQuantity.setText(String.valueOf(crypto.getQuantity()));
+        editBuyInPrice.setText(String.valueOf(crypto.getBuyInPrice()));
+        editPurchaseDate.setText(crypto.getPurchaseDate());
+
+        buttonSave.setOnClickListener(v -> {
+            String name = editName.getText().toString().trim();
+            String purchaseDate = editPurchaseDate.getText().toString().trim();
+
+            if (name.isEmpty() || purchaseDate.isEmpty()) {
+                Toast.makeText(requireContext(), "Заполните все поля", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            double quantity = parseDouble(editQuantity.getText().toString());
+            double buyInPrice = parseDouble(editBuyInPrice.getText().toString());
+
+            if (quantity <= 0 || buyInPrice <= 0) {
+                Toast.makeText(requireContext(), "Количество и цена должны быть больше нуля", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            // Получаем текущую цену (например, из API или оставляем как есть)
+            double currentPrice = crypto.getCurrentPrice(); // можно оставить старое значение
+
+            // Создаём новый объект Crypto с обновлёнными данными
+            Crypto updatedCrypto = new Crypto(
+                    name,
+                    CryptoSymbolMapper.generateSymbol(name),
+                    quantity,
+                    buyInPrice,
+                    currentPrice, // можно обновить через API, если нужно
+                    purchaseDate
+            );
+
+            // Обновляем запись в БД по ID
+            dbHelper.updateCryptoData(updatedCrypto);
+
+            // Обновляем UI
+            List<Crypto> updatedList = dbHelper.getAllCryptos();
+            fillCryptoContainer((ArrayList<Crypto>) updatedList, cryptoContainer);
+
+            bottomSheetDialog.dismiss();
+        });
+
+        bottomSheetDialog.show();
+    }
+
     double getCurrentPriceFromAPI(String name) {
         return 3.141592653979;
     }

@@ -250,7 +250,7 @@ public class CryptoDBHelper extends SQLiteOpenHelper {
     }
 
     // Опционально: метод обновления данных
-    private void updateCryptoData(Crypto crypto) {
+    void updateCryptoData(Crypto crypto) {
         updateCryptoQuantity(crypto.getSymbol(), crypto.getQuantity());
         updateCryptoBuyPrice(crypto.getSymbol(), crypto.getBuyInPrice());
         updateCryptoCurrentPrice(crypto.getSymbol(), crypto.getCurrentPrice());
