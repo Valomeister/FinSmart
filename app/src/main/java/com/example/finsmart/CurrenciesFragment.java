@@ -1,18 +1,27 @@
 package com.example.finsmart;
 
+import static java.lang.Double.parseDouble;
+
 import android.content.Context;
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
 
+import android.util.Log;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import com.google.android.material.bottomsheet.BottomSheetDialog;
+
+import org.w3c.dom.Text;
 
 import java.text.NumberFormat;
 import java.util.ArrayList;
@@ -23,20 +32,32 @@ import java.util.Map;
 public class CurrenciesFragment extends Fragment {
 
     private HashMap<String, Integer> currencyIconMap;
+    CurrencyDBHelper dbHelper;
+    LinearLayout currencyContainer;
+    View fragmentView;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        View view = inflater.inflate(R.layout.fragment_currencies, container, false);
+        fragmentView = inflater.inflate(R.layout.fragment_currencies, container, false);
 
         setToolbar(inflater, "Валюта");
 
-        LinearLayout currencyContainer = view.findViewById(R.id.currencyContainer);
+        initCurrencyIcons();
+
+        dbHelper = new CurrencyDBHelper(requireContext());
+        // Для заполнения пустой БД небольшим набором данных:
+        dbHelper.populateInitialData();
+
+        currencyContainer = fragmentView.findViewById(R.id.currencyContainer);
         ArrayList<Currency> currencies =  getCurrenciesFromDataBase();
         fillCurrencyContainer(currencies, currencyContainer);
 
-        return view;
+        Button addCurrencyButton = fragmentView.findViewById(R.id.add_currency_button);
+        addCurrencyButton.setOnClickListener(v -> showAddCurrencyBottomSheet());
+
+        return fragmentView;
     }
 
     // TODO: 28.05.2025 в DepositsFragment и FundsFragment дублируется тело этого метода
@@ -65,25 +86,20 @@ public class CurrenciesFragment extends Fragment {
         });
 
 
+
         toolbarLinearLayout.addView(toolbarNavBack);
     }
 
     ArrayList<Currency> getCurrenciesFromDataBase() {
-        ArrayList<Currency> currencies = new ArrayList<>();
-
-        // Добавляем валюты с рандомизированными данными
-        // TODO: 29.05.2025 Сделать особое оформление для основной валюты в приложении - рублю,
-        // например, не нужно xchange rrate и динамику показывать.
-        currencies.add(new Currency("Доллар США", "USD", '$', 150, 74.50, 76.30, "15.11.2024"));
-        currencies.add(new Currency("Евро", "EUR", '€', 200, 82.10, 80.50, "10.01.2025"));
-        currencies.add(new Currency("Китайский юань", "CNY", '¥', 1000, 10.20, 10.75, "05.02.2025"));
-        currencies.add(new Currency("Российский рубль", "RUB", '₽', 15000, 1.0, 1.0, "19.12.2024"));
+        ArrayList<Currency> currencies = (ArrayList<Currency>) dbHelper.getAllCurrencies();
 
         return currencies;
     }
 
     private void fillCurrencyContainer(ArrayList<Currency> currencies, LinearLayout currencyContainer) {
-        initCurrencyIcons();
+        // Удаляем все существующие элементы
+        currencyContainer.removeAllViews();
+
         for (int i = 0; i < currencies.size(); i++) {
             boolean last = i == currencies.size() - 1;
             View currencyItem = createCurrencyItem(currencies.get(i), currencyContainer, last);
@@ -126,19 +142,18 @@ public class CurrenciesFragment extends Fragment {
                 .replace(',', ' ');
         tvCurrencyExchangeRateDynamics.setText(formattedDynamics);
 
-        // Логотип валюты
-        ImageView currencyIcon = item.findViewById(R.id.currencyIcon);
+        // Обработчик кнопки редактирования
+        ivEditButton.setOnClickListener(v -> showEditCurrencyBottomSheet(currency));
 
         // Получаем ID иконки из словаря по названию банка
         Integer iconResId = currencyIconMap.get(currency.getCode());
 
         if (iconResId != null) {
-            currencyIcon.setImageResource(iconResId);
+            ivCurrencyIcon.setImageResource(iconResId);
         } else {
             // Если банк не найден в списке — ставим дефолтную иконку
-            currencyIcon.setImageResource(R.drawable.bank_default_icon);
+            ivCurrencyIcon.setImageResource(R.drawable.bank_default_icon);
         }
-
 
         if (!last) {
             LinearLayout currencyBody = item.findViewById(R.id.currencyBody);
@@ -153,6 +168,146 @@ public class CurrenciesFragment extends Fragment {
         }
 
         return item;
+    }
+
+    private void showAddCurrencyBottomSheet() {
+        BottomSheetDialog bottomSheetDialog = new BottomSheetDialog(requireContext());
+        View dialogView = getLayoutInflater().inflate(R.layout.dialog_add_currency, null);
+        bottomSheetDialog.setContentView(dialogView);
+
+        EditText editName = dialogView.findViewById(R.id.editName);
+        EditText editQuantity = dialogView.findViewById(R.id.editQuantity);
+        EditText editPurchaseDate = dialogView.findViewById(R.id.editPurchaseDate);
+        EditText editBuyInPrice = dialogView.findViewById(R.id.editBuyInPrice);
+        Button buttonAdd = dialogView.findViewById(R.id.buttonAdd);
+
+        buttonAdd.setOnClickListener(v -> {
+            String name = editName.getText().toString().trim();
+            String purchaseDate = editPurchaseDate.getText().toString().trim();
+
+            // Валидация данных
+            if (name.isEmpty() || purchaseDate.isEmpty() ) {
+                Toast.makeText(requireContext(), "Заполните все поля", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            double quantity = parseDouble(editQuantity.getText().toString());
+            double buyInPrice = parseDouble(editBuyInPrice.getText().toString());
+
+            // Валидация данных
+            if (quantity <= 0 || buyInPrice <= 0) {
+                Toast.makeText(requireContext(), "Количество и цена должны быть больше нуля", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            String currencyCode = CurrencySymbolMapper.generateCurrencyCode(name);
+            // Проверяем, существует ли уже такая крипта
+            if (dbHelper.getCurrencyByCode(currencyCode) != null) {
+                Toast.makeText(requireContext(), "Валюта с таким названием уже есть", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            char currencySymbol = CurrencySymbolMapper.generateSymbol(name);
+            // Добавляем в БД
+            dbHelper.addCurrency(new Currency(
+                    name,
+                    currencyCode,
+                    currencySymbol, // Например, "USDT" → "USDT"
+                    quantity,
+                    buyInPrice,
+                    getCurrentPriceFromAPI(name), // Здесь можешь получить текущую цену из API
+                    purchaseDate
+            ));
+
+            // Обновляем UI
+            List<Currency> updatedList = dbHelper.getAllCurrencies();
+            fillCurrencyContainer((ArrayList<Currency>) updatedList, currencyContainer);
+
+            bottomSheetDialog.dismiss();
+        });
+
+        bottomSheetDialog.show();
+    }
+
+    private void showEditCurrencyBottomSheet(Currency currency) {
+        BottomSheetDialog bottomSheetDialog = new BottomSheetDialog(requireContext());
+        View dialogView = getLayoutInflater().inflate(R.layout.dialog_edit_currency, null);
+        bottomSheetDialog.setContentView(dialogView);
+
+        TextView currencyName = dialogView.findViewById(R.id.currencyName);
+        EditText editQuantity = dialogView.findViewById(R.id.editQuantity);
+        EditText editPurchaseDate = dialogView.findViewById(R.id.editPurchaseDate);
+        EditText editBuyInPrice = dialogView.findViewById(R.id.editBuyInPrice);
+        Button buttonSave = dialogView.findViewById(R.id.buttonSave);
+        Button buttonDelete = dialogView.findViewById(R.id.buttonDelete);
+
+        // Заполняем поля текущими данными
+        currencyName.setText(currency.getName());
+        editQuantity.setText(String.valueOf(currency.getQuantity()));
+        editBuyInPrice.setText(String.valueOf(currency.getPurchaseExchangeRate()));
+        editPurchaseDate.setText(currency.getPurchaseDate());
+
+        buttonSave.setOnClickListener(v -> {
+            String purchaseDate = editPurchaseDate.getText().toString().trim();
+            String quantityRaw = editQuantity.getText().toString();
+            String buyInPriceRaw = editBuyInPrice.getText().toString();
+
+            if (purchaseDate.isEmpty() ||
+                    quantityRaw.isEmpty() || buyInPriceRaw.isEmpty()) {
+                Toast.makeText(requireContext(), "Заполните все поля", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            double quantity = parseDouble(quantityRaw);
+            double buyInPrice = parseDouble(buyInPriceRaw);
+
+            if (quantity <= 0 || buyInPrice <= 0) {
+                Toast.makeText(requireContext(), "Количество и цена должны быть больше нуля", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+
+            // Создаём новый объект Crypto с обновлёнными данными
+            Currency updatedCurrency = new Currency(
+                    currency.getName(),
+                    currency.getCode(), // TODO: 29.05.2025 типо CryptoSymbolMapper.generateSymbol
+                    currency.getSymbol(),
+                    quantity,
+                    buyInPrice,
+                    currency.getCurrentExchangeRate(), // можно обновить через API, если нужно
+                    purchaseDate
+            );
+
+            // Обновляем запись в БД по ID
+            dbHelper.updateCurrency(updatedCurrency);
+
+            // Обновляем UI
+            List<Currency> updatedList = dbHelper.getAllCurrencies();
+            fillCurrencyContainer((ArrayList<Currency>) updatedList, currencyContainer);
+
+            bottomSheetDialog.dismiss();
+        });
+
+        // --- Логика удаления ---
+        buttonDelete.setOnClickListener(v -> {
+            // Удаляем из БД по коду валюты
+            dbHelper.deleteCurrency(currency);
+
+            // Удаляем из UI
+            List<Currency> updatedList = dbHelper.getAllCurrencies();
+            fillCurrencyContainer((ArrayList<Currency>) updatedList, currencyContainer);
+
+            bottomSheetDialog.dismiss();
+
+            // Показываем сообщение
+            Toast.makeText(requireContext(), "Валюта удалена", Toast.LENGTH_SHORT).show();
+        });
+
+        bottomSheetDialog.show();
+    }
+
+    double getCurrentPriceFromAPI(String name) {
+        return 3.141592653979;
     }
 
     // TODO: 29.05.2025 Подобрать нормальные, одинаковые по размеру иконки
