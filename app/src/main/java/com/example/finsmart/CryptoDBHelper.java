@@ -123,6 +123,12 @@ public class CryptoDBHelper extends SQLiteOpenHelper {
         );
     }
 
+    public void deleteCrypto(Crypto crypto) {
+        String code = crypto.getSymbol();
+        SQLiteDatabase db = this.getWritableDatabase();
+        db.delete(TABLE_CRYPTO, COLUMN_SYMBOL + " = ?", new String[]{code});
+    }
+
     // Получить все крипты
     public List<Crypto> getAllCryptos() {
         List<Crypto> cryptos = new ArrayList<>();

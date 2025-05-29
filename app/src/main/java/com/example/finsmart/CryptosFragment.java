@@ -49,13 +49,16 @@ public class CryptosFragment extends Fragment {
         initCryptoIcons();
 
         dbHelper = new CryptoDBHelper(requireContext());
-        dbHelper.populateInitialData();
+
+        // Для заполнения пустой БД небольшим набором данных:
+//        dbHelper.populateInitialData();
 
         cryptoContainer = fragmentView.findViewById(R.id.cryptoContainer);
         ArrayList<Crypto> cryptos =  getCryptosFromDataBase();
         fillCryptoContainer(cryptos, cryptoContainer);
 
-
+        Button addCryptoButton = fragmentView.findViewById(R.id.add_crypto_button);
+        addCryptoButton.setOnClickListener(v -> showAddCryptoBottomSheet());
 
         return fragmentView;
     }
@@ -92,12 +95,6 @@ public class CryptosFragment extends Fragment {
     ArrayList<Crypto> getCryptosFromDataBase() {
         List<Crypto> cryptoList = dbHelper.getAllCryptos();
 
-        for (Crypto crypto : cryptoList) {
-            Log.d("CryptoDB", "Символ: " + crypto.getSymbol() +
-                    ", Количество: " + crypto.getQuantity() +
-                    ", Цена: " + crypto.getCurrentPrice());
-        }
-
         return (ArrayList<Crypto>) cryptoList;
     }
 
@@ -110,9 +107,6 @@ public class CryptosFragment extends Fragment {
             View cryptoItem = createCryptoItem(cryptos.get(i), cryptoContainer, last);
             cryptoContainer.addView(cryptoItem);
         }
-
-        Button addCryptoButton = fragmentView.findViewById(R.id.add_crypto_button);
-        addCryptoButton.setOnClickListener(v -> showAddCryptoBottomSheet());
     }
     private View createCryptoItem(Crypto crypto, LinearLayout  cryptoContainer, boolean last) {
         LayoutInflater inflater = LayoutInflater.from(requireContext());
@@ -150,8 +144,8 @@ public class CryptosFragment extends Fragment {
                 .replace(',', ' ').replace('.', ',');
         tvCryptoPurchaseExchangeRate.setText(formattedPurchasePrice);
 
+        // Обработчик кнопки редактирования
         ivEditButton.setOnClickListener(v -> showEditCryptoBottomSheet(crypto));
-
 
         // Раскраска динамики: зелёный — рост, красный — падение
         double returnPercentage = crypto.getReturnPercentage();
@@ -262,29 +256,31 @@ public class CryptosFragment extends Fragment {
         View dialogView = getLayoutInflater().inflate(R.layout.dialog_edit_crypto, null);
         bottomSheetDialog.setContentView(dialogView);
 
-        EditText editName = dialogView.findViewById(R.id.editName);
+        TextView cryptoName = dialogView.findViewById(R.id.cryptoName);
         EditText editQuantity = dialogView.findViewById(R.id.editQuantity);
         EditText editPurchaseDate = dialogView.findViewById(R.id.editPurchaseDate);
         EditText editBuyInPrice = dialogView.findViewById(R.id.editBuyInPrice);
         Button buttonSave = dialogView.findViewById(R.id.buttonSave);
+        Button buttonDelete = dialogView.findViewById(R.id.buttonDelete);
 
         // Заполняем поля текущими данными
-        editName.setText(crypto.getName());
+        cryptoName.setText(crypto.getName());
         editQuantity.setText(String.valueOf(crypto.getQuantity()));
         editBuyInPrice.setText(String.valueOf(crypto.getBuyInPrice()));
         editPurchaseDate.setText(crypto.getPurchaseDate());
 
         buttonSave.setOnClickListener(v -> {
-            String name = editName.getText().toString().trim();
             String purchaseDate = editPurchaseDate.getText().toString().trim();
+            String quantityRaw = editQuantity.getText().toString();
+            String buyInPriceRaw = editBuyInPrice.getText().toString();
 
-            if (name.isEmpty() || purchaseDate.isEmpty()) {
+            if (purchaseDate.isEmpty() || quantityRaw.isEmpty() || buyInPriceRaw.isEmpty() ) {
                 Toast.makeText(requireContext(), "Заполните все поля", Toast.LENGTH_SHORT).show();
                 return;
             }
 
-            double quantity = parseDouble(editQuantity.getText().toString());
-            double buyInPrice = parseDouble(editBuyInPrice.getText().toString());
+            double quantity = parseDouble(quantityRaw);
+            double buyInPrice = parseDouble(buyInPriceRaw);
 
             if (quantity <= 0 || buyInPrice <= 0) {
                 Toast.makeText(requireContext(), "Количество и цена должны быть больше нуля", Toast.LENGTH_SHORT).show();
@@ -292,15 +288,14 @@ public class CryptosFragment extends Fragment {
             }
 
             // Получаем текущую цену (например, из API или оставляем как есть)
-            double currentPrice = crypto.getCurrentPrice(); // можно оставить старое значение
 
             // Создаём новый объект Crypto с обновлёнными данными
             Crypto updatedCrypto = new Crypto(
-                    name,
-                    CryptoSymbolMapper.generateSymbol(name),
+                    crypto.getName(),
+                    crypto.getSymbol(),
                     quantity,
                     buyInPrice,
-                    currentPrice, // можно обновить через API, если нужно
+                    crypto.getCurrentPrice(), // можно обновить через API, если нужно
                     purchaseDate
             );
 
@@ -312,6 +307,21 @@ public class CryptosFragment extends Fragment {
             fillCryptoContainer((ArrayList<Crypto>) updatedList, cryptoContainer);
 
             bottomSheetDialog.dismiss();
+        });
+
+        // --- Логика удаления ---
+        buttonDelete.setOnClickListener(v -> {
+            // Удаляем из БД по коду валюты
+            dbHelper.deleteCrypto(crypto);
+
+            // Удаляем из UI
+            List<Crypto> updatedList = dbHelper.getAllCryptos();
+            fillCryptoContainer((ArrayList<Crypto>) updatedList, cryptoContainer);
+
+            bottomSheetDialog.dismiss();
+
+            // Показываем сообщение
+            Toast.makeText(requireContext(), "Валюта удалена", Toast.LENGTH_SHORT).show();
         });
 
         bottomSheetDialog.show();
