@@ -2,14 +2,15 @@ package com.example.finsmart;
 
 public class Fund {
     private String fundName;
-    private double amount;
-    private double dynamics; // Динамика с момента покупки
-    private String startDate;
+    private double amount;         // Сумма (в рублях)
+    private double investedSum;    // Вложено средств
+    private double dynamics;       // Динамика с момента покупки (%)
+    private String startDate;      // Дата вложения
 
-    public Fund(String fundName, double amount, double dynamics, String startDate) {
+    public Fund(String fundName, double amount, double investedSum, String startDate) {
         this.fundName = fundName;
         this.amount = amount;
-        this.dynamics = dynamics;
+        this.investedSum = investedSum;
         this.startDate = startDate;
     }
 
@@ -22,12 +23,15 @@ public class Fund {
         return amount;
     }
 
+    public double getInvestedSum() {
+        return investedSum;
+    }
+
     public double getDynamics() {
-        return dynamics;
+        return amount / investedSum;
     }
 
     public String getStartDate() {
         return startDate;
     }
-
 }

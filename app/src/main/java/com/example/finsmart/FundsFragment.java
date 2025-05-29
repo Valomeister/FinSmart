@@ -1,5 +1,7 @@
 package com.example.finsmart;
 
+import static java.lang.Double.parseDouble;
+
 import android.content.Context;
 import android.os.Bundle;
 
@@ -9,10 +11,14 @@ import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import com.google.android.material.bottomsheet.BottomSheetDialog;
 
 import java.text.NumberFormat;
 import java.util.ArrayList;
@@ -23,20 +29,32 @@ import java.util.Map;
 public class FundsFragment extends Fragment {
 
     private HashMap<String, Integer> fundIconMap;
+    FundDBHelper dbHelper;
+    LinearLayout fundContainer;
+    View fragmentView;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        View view = inflater.inflate(R.layout.fragment_funds, container, false);
+        fragmentView = inflater.inflate(R.layout.fragment_funds, container, false);
 
         setToolbar(inflater, "Фонды");
 
-        LinearLayout fundContainer = view.findViewById(R.id.fundContainer);
+        initFundIcons();
+
+        dbHelper = new FundDBHelper(requireContext());
+        // Для заполнения пустой БД небольшим набором данных:
+        dbHelper.populateInitialData();
+
+        fundContainer = fragmentView.findViewById(R.id.fundContainer);
         ArrayList<Fund> funds =  getFundsFromDataBase();
         fillFundContainer(funds, fundContainer);
 
-        return view;
+        Button addFundButton = fragmentView.findViewById(R.id.add_fund_button);
+        addFundButton.setOnClickListener(v -> showAddFundBottomSheet());
+
+        return fragmentView;
     }
 
     // TODO: 28.05.2025 в DepositsFragment и FundsFragment дублируется тело этого метода
@@ -69,23 +87,15 @@ public class FundsFragment extends Fragment {
     }
 
     ArrayList<Fund> getFundsFromDataBase() {
-        ArrayList<Fund> funds = new ArrayList<>();
-
-        // Добавляем депозиты вручную
-        funds.add(new Fund("АО ВИМ Инвестиции", 290000, 17.0, "19.12.2024"));
-        funds.add(new Fund("Альфа-Капитал", 520000, 18.7, "05.01.2025"));
-        funds.add(new Fund("УК «Первая»", 145000, 16.2, "12.11.2024"));
-        funds.add(new Fund("УК «Брокеркредитсервис»", 280000, 17.3, "22.12.2024"));
-        funds.add(new Fund("Атон-менеджмент", 300000, 16.8, "17.12.2024"));
-        funds.add(new Fund("Финам Менеджмент", 275000, 17.1, "20.12.2024"));
-        funds.add(new Fund("УК «ААА Управление Капиталом»", 310000, 16.9, "18.12.2024"));
-        funds.add(new Fund("Т-Капитал", 295000, 17.2, "21.12.2024"));
+        ArrayList<Fund> funds = (ArrayList<Fund>) dbHelper.getAllFunds();
 
         return funds;
     }
 
     private void fillFundContainer(ArrayList<Fund> funds, LinearLayout fundContainer) {
-        initFundIcons();
+        // Удаляем все существующие элементы
+        fundContainer.removeAllViews();
+
         for (int i = 0; i < funds.size(); i++) {
             boolean last = i == funds.size() - 1;
             View fundItem = createFundItem(funds.get(i), fundContainer, last);
@@ -99,8 +109,11 @@ public class FundsFragment extends Fragment {
         // Находим все TextView
         TextView tvFundName = item.findViewById(R.id.fundName);
         TextView tvFundSum = item.findViewById(R.id.fundSum);
-        TextView tvFundDynamics = item.findViewById(R.id.fundDynamics);
         TextView tvFundDate = item.findViewById(R.id.fundDate);
+        TextView tvFundInvestedSum = item.findViewById(R.id.fundInvestedSum);
+        TextView tvFundDynamics = item.findViewById(R.id.fundDynamics);
+        ImageView ivCurrencyIcon = item.findViewById(R.id.fundIcon);
+        ImageView ivEditButton = item.findViewById(R.id.editButton);
 
         // Устанавливаем данные
         tvFundName.setText(fund.getFundName());
@@ -110,18 +123,22 @@ public class FundsFragment extends Fragment {
         tvFundDynamics.setText(String.format("%.2f%%", fund.getDynamics()).
                 replace('.', ','));
         tvFundDate.setText(fund.getStartDate());
+        String formattedInvestedSum = String.format("%,.2f ₽", fund.getInvestedSum())
+                .replace(',', ' ');
+        tvFundInvestedSum.setText(formattedInvestedSum);
 
-        // Логотип банка
-        ImageView fundIcon = item.findViewById(R.id.fundIcon);
+
+        // Обработчик кнопки редактирования
+        ivEditButton.setOnClickListener(v -> showEditFundBottomSheet(fund));
 
         // Получаем ID иконки из словаря по названию банка
         Integer iconResId = fundIconMap.get(fund.getFundName());
 
         if (iconResId != null) {
-            fundIcon.setImageResource(iconResId);
+            ivCurrencyIcon.setImageResource(iconResId);
         } else {
             // Если банк не найден в списке — ставим дефолтную иконку
-            fundIcon.setImageResource(R.drawable.bank_default_icon);
+            ivCurrencyIcon.setImageResource(R.drawable.bank_default_icon);
         }
 
 
@@ -138,6 +155,130 @@ public class FundsFragment extends Fragment {
         }
 
         return item;
+    }
+
+    private void showAddFundBottomSheet() {
+        BottomSheetDialog bottomSheetDialog = new BottomSheetDialog(requireContext());
+        View dialogView = getLayoutInflater().inflate(R.layout.dialog_add_fund, null);
+        bottomSheetDialog.setContentView(dialogView);
+
+        EditText editName = dialogView.findViewById(R.id.editName);
+        EditText editPurchaseDate = dialogView.findViewById(R.id.editPurchaseDate);
+        EditText editBuyInPrice = dialogView.findViewById(R.id.editBuyInPrice);
+        Button buttonAdd = dialogView.findViewById(R.id.buttonAdd);
+
+        buttonAdd.setOnClickListener(v -> {
+            String name = editName.getText().toString().trim();
+            String purchaseDate = editPurchaseDate.getText().toString().trim();
+
+            // Валидация данных
+            if (name.isEmpty() || purchaseDate.isEmpty() ) {
+                Toast.makeText(requireContext(), "Заполните все поля", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            double buyInPrice = parseDouble(editBuyInPrice.getText().toString());
+
+            // Валидация данных
+            if (buyInPrice <= 0) {
+                Toast.makeText(requireContext(), "Цена должны быть больше нуля", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            // Проверяем, существует ли уже такая крипта
+            if (dbHelper.getFundByName(name) != null) {
+                Toast.makeText(requireContext(), "Фонд с таким названием уже есть", Toast.LENGTH_SHORT).show();
+                return;
+            }
+            double currentFundPrice = buyInPrice * 1.2;
+            // Добавляем в БД
+            dbHelper.addFund(new Fund(
+                    name,
+                    getCurrentPriceFromAPI(buyInPrice),
+                    buyInPrice,
+                    purchaseDate
+            ));
+
+            // Обновляем UI
+            List<Fund> updatedList = dbHelper.getAllFunds();
+            fillFundContainer((ArrayList<Fund>) updatedList, fundContainer);
+
+            bottomSheetDialog.dismiss();
+        });
+
+        bottomSheetDialog.show();
+    }
+
+    private void showEditFundBottomSheet(Fund fund) {
+        BottomSheetDialog bottomSheetDialog = new BottomSheetDialog(requireContext());
+        View dialogView = getLayoutInflater().inflate(R.layout.dialog_edit_fund, null);
+        bottomSheetDialog.setContentView(dialogView);
+
+        TextView fundName = dialogView.findViewById(R.id.fundName);
+        EditText editPurchaseDate = dialogView.findViewById(R.id.editPurchaseDate);
+        EditText editBuyInPrice = dialogView.findViewById(R.id.editBuyInPrice);
+        Button buttonSave = dialogView.findViewById(R.id.buttonSave);
+        Button buttonDelete = dialogView.findViewById(R.id.buttonDelete);
+
+        // Заполняем поля текущими данными
+        fundName.setText(fund.getFundName());
+        editBuyInPrice.setText(String.valueOf(fund.getInvestedSum()));
+        editPurchaseDate.setText(fund.getStartDate());
+
+        buttonSave.setOnClickListener(v -> {
+            String purchaseDate = editPurchaseDate.getText().toString().trim();
+            String buyInPriceRaw = editBuyInPrice.getText().toString();
+
+            if (purchaseDate.isEmpty() || buyInPriceRaw.isEmpty()) {
+                Toast.makeText(requireContext(), "Заполните все поля", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            double buyInPrice = parseDouble(buyInPriceRaw);
+
+            if (buyInPrice <= 0) {
+                Toast.makeText(requireContext(), "Цена должны быть больше нуля", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+
+            // Создаём новый объект Crypto с обновлёнными данными
+            Fund updatedStock = new Fund(
+                    fund.getFundName(),
+                    getCurrentPriceFromAPI(buyInPrice), // TODO: 29.05.2025 типо CryptoSymbolMapper.generateSymbol
+                    buyInPrice,
+                    purchaseDate);
+
+            // Обновляем запись в БД по ID
+            dbHelper.updateFund(updatedStock);
+
+            // Обновляем UI
+            List<Fund> updatedList = dbHelper.getAllFunds();
+            fillFundContainer((ArrayList<Fund>) updatedList, fundContainer);
+
+            bottomSheetDialog.dismiss();
+        });
+
+        // --- Логика удаления ---
+        buttonDelete.setOnClickListener(v -> {
+            // Удаляем из БД по коду валюты
+            dbHelper.deleteFund(fund);
+
+            // Удаляем из UI
+            List<Fund> updatedList = dbHelper.getAllFunds();
+            fillFundContainer((ArrayList<Fund>) updatedList, fundContainer);
+
+            bottomSheetDialog.dismiss();
+
+            // Показываем сообщение
+            Toast.makeText(requireContext(), "Акция удалена", Toast.LENGTH_SHORT).show();
+        });
+
+        bottomSheetDialog.show();
+    }
+
+    double getCurrentPriceFromAPI(double buyInPrice) {
+        return buyInPrice * 1.15;
     }
 
     private void initFundIcons() {

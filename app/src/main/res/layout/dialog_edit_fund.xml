@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    android:paddingTop="8dp"
+    android:paddingStart="16dp"
+    android:paddingEnd="16dp"
+    android:paddingBottom="21dp"
+    android:background="@drawable/dialog_background">
+
+    <View
+        android:id="@+id/drag_handle"
+        android:layout_width="63dp"
+        android:layout_height="4dp"
+        android:layout_gravity="center_horizontal"
+        android:background="@drawable/dialog_dragger" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Редактирование фонда"
+        android:textSize="18sp"
+        android:textStyle="bold"
+        android:layout_marginVertical="32dp"
+        android:layout_gravity="center_horizontal"/>
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textSize="12sp"
+        android:paddingHorizontal="2dp"
+        android:text="Название" />
+
+    <TextView
+        android:id="@+id/fundName"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:inputType="textCapWords"
+        android:includeFontPadding="false"
+        android:paddingTop="4dp"
+        android:paddingHorizontal="2dp"
+        android:maxLines="1"/>
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textSize="12sp"
+        android:layout_marginTop="6dp"
+        android:paddingHorizontal="2dp"
+        android:text="Дата покупки" />
+
+    <EditText
+        android:id="@+id/editPurchaseDate"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:includeFontPadding="false"
+        android:paddingTop="4dp"
+        android:paddingHorizontal="2dp"
+        android:inputType="date"
+        android:maxLines="1" />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textSize="12sp"
+        android:layout_marginTop="6dp"
+        android:paddingHorizontal="2dp"
+        android:text="Стоимость" />
+
+    <EditText
+        android:id="@+id/editBuyInPrice"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:inputType="numberDecimal"
+
+        android:includeFontPadding="false"
+        android:paddingTop="4dp"
+        android:paddingHorizontal="2dp"
+        android:maxLines="1" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:weightSum="2"
+        android:layout_marginTop="24dp">
+        <Button
+            android:id="@+id/buttonDelete"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            app:backgroundTint="@null"
+            android:background="@drawable/button_red_background"
+            android:text="Удалить"
+            android:textColor="#FFFFFF"
+            android:textSize="16sp"
+            android:padding="8dp"
+            android:gravity="center"/>
+
+        <!-- Отступ между кнопками -->
+        <View
+            android:layout_width="8dp"
+            android:layout_height="0dp"/>
+        <Button
+            android:id="@+id/buttonSave"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Сохранить"
+            android:background="@drawable/button_background"
+            android:textColor="#FFFFFF"
+            android:textSize="16sp"
+            android:padding="8dp"
+            android:gravity="center"/>
+    </LinearLayout>
+</LinearLayout>
