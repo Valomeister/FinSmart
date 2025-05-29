@@ -5,9 +5,8 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
-import android.util.Log;
 
-public class DatabaseHelper extends SQLiteOpenHelper {
+public class UserDatabaseHelper extends SQLiteOpenHelper {
 
     private static final String DATABASE_NAME = "user_db";
     private static final int DATABASE_VERSION = 1;
@@ -22,7 +21,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                     COLUMN_PHONE + " TEXT PRIMARY KEY NOT NULL, " +
                     COLUMN_PASSWORD_HASH + " TEXT NOT NULL);";
 
-    public DatabaseHelper(Context context) {
+    public UserDatabaseHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
     }
 

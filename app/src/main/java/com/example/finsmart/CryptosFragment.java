@@ -27,6 +27,7 @@ import java.util.Locale;
 public class CryptosFragment extends Fragment {
 
     private HashMap<String, Integer> cryptoIconMap;
+    CryptoDBHelper dbHelper;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -35,6 +36,9 @@ public class CryptosFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_cryptos, container, false);
 
         setToolbar(inflater, "Крипта");
+
+        dbHelper = new CryptoDBHelper(requireContext());
+        dbHelper.populateInitialData();
 
         LinearLayout cryptoContainer = view.findViewById(R.id.cryptoContainer);
         ArrayList<Crypto> cryptos =  getCryptosFromDataBase();
@@ -73,15 +77,15 @@ public class CryptosFragment extends Fragment {
     }
 
     ArrayList<Crypto> getCryptosFromDataBase() {
-        ArrayList<Crypto> cryptos = new ArrayList<>();
+        List<Crypto> cryptoList = dbHelper.getAllCryptos();
 
-        // Добавляем криптовалюты с ценами в RUB, суммарная стоимость ~200 000 руб.
-        cryptos.add(new Crypto("Bitcoin", "BTC", 0.01123112, 2_500_000, 2_700_000, "15.11.2024"));     // ~27 000
-        cryptos.add(new Crypto("Ethereum", "ETH", 0.25548942, 160_000, 180_000, "10.01.2025"));       // ~36 000
-        cryptos.add(new Crypto("Solana", "SOL", 3.15125436, 8_000, 9_000, "05.02.2025"));              // ~27 000
-        cryptos.add(new Crypto("Toncoin", "TON", 950.35239124, 150, 110, "19.12.2024"));
+        for (Crypto crypto : cryptoList) {
+            Log.d("CryptoDB", "Символ: " + crypto.getSymbol() +
+                    ", Количество: " + crypto.getQuantity() +
+                    ", Цена: " + crypto.getCurrentPrice());
+        }
 
-        return cryptos;
+        return (ArrayList<Crypto>) cryptoList;
     }
 
     private void fillCryptoContainer(ArrayList<Crypto> cryptos, LinearLayout cryptoContainer) {
@@ -174,4 +178,6 @@ public class CryptosFragment extends Fragment {
         cryptoIconMap.put("SOL", R.drawable.sol_icon);
         cryptoIconMap.put("TON", R.drawable.ton_icon);
     }
+
+
 }

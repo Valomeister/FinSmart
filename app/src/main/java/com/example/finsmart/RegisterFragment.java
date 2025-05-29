@@ -5,7 +5,6 @@ import java.util.regex.Pattern;
 import android.content.res.ColorStateList;
 import android.graphics.Color;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -19,7 +18,7 @@ import androidx.fragment.app.Fragment;
 
 public class RegisterFragment extends Fragment {
 
-    DatabaseHelper dbHelper;
+    UserDatabaseHelper dbHelper;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -54,7 +53,7 @@ public class RegisterFragment extends Fragment {
             // Хэшируем пароль (если нужно)
             String passwordHash = HashUtils.sha256(password);
 
-            dbHelper = new DatabaseHelper(requireContext());
+            dbHelper = new UserDatabaseHelper(requireContext());
 
             TextView loginErrorText = view.findViewById(R.id.loginError);
             TextView passwordErrorText = view.findViewById(R.id.passwordError);

@@ -1,36 +1,25 @@
 package com.example.finsmart;
 
-import java.util.Objects;
 import java.util.regex.Pattern;
 
-import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
-import android.app.PendingIntent;
-import android.content.Context;
-import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.content.res.ColorStateList;
-import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.Manifest;
 
-import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.app.ActivityCompat;
 import androidx.core.app.NotificationCompat;
 import androidx.core.app.NotificationManagerCompat;
-import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 
 public class ResetPasswordFragment extends Fragment {
@@ -41,7 +30,7 @@ public class ResetPasswordFragment extends Fragment {
         createNotificationChannel();
     }
 
-    DatabaseHelper dbHelper;
+    UserDatabaseHelper dbHelper;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -84,7 +73,7 @@ public class ResetPasswordFragment extends Fragment {
             // Хэшируем пароль
             String passwordHash = HashUtils.sha256(password);
 
-            dbHelper = new DatabaseHelper(requireContext());
+            dbHelper = new UserDatabaseHelper(requireContext());
 
             TextView loginErrorText = view.findViewById(R.id.phoneError);
             TextView smsCodeErrorText = view.findViewById(R.id.smsCodeError);
