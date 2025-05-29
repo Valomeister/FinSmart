@@ -5,7 +5,7 @@
     android:orientation="vertical"
     android:background="#FFFFFF"
     android:padding="24dp"
-    android:id="@+id/currencyBody"
+    android:id="@+id/cryptoBody"
     xmlns:android="http://schemas.android.com/apk/res/android">
     <LinearLayout
         android:layout_width="match_parent"
@@ -13,18 +13,18 @@
         android:orientation="horizontal"
         android:layout_marginBottom="20dp">`
         <ImageView
-            android:id="@+id/currencyIcon"
+            android:id="@+id/cryptoIcon"
             android:layout_width="36dp"
             android:layout_height="wrap_content"
             android:adjustViewBounds="true"
             android:scaleType="fitCenter"
-            app:srcCompat="@drawable/usd_icon"
+            app:srcCompat="@drawable/sber_icon"
             android:layout_marginEnd="14dp"/>
         <TextView
-            android:id="@+id/currencyName"
+            android:id="@+id/cryptoName"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Долллар США"
+            android:text="Bitcoin"
             android:textSize="20sp"
             android:textStyle="bold"
             android:layout_gravity="center_vertical"/>
@@ -59,10 +59,10 @@
             android:textSize="16sp"/>
 
         <TextView
-            android:id="@+id/currencyConvertedSum"
+            android:id="@+id/cryptoConvertedSum"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="290 000 ₽"
+            android:text="225 125,32 ₽"
             android:textSize="16sp"
             android:textColor="#7D7AFF"
             android:textStyle="bold" />
@@ -85,10 +85,10 @@
             android:textSize="16sp"/>
 
         <TextView
-            android:id="@+id/currencyExchangeRate"
+            android:id="@+id/cryptoExchangeRate"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="82,22 ₽"
+            android:text="9 242 111,18 ₽"
             android:textSize="16sp"
             android:textStyle="bold" />
     </LinearLayout>
@@ -109,10 +109,10 @@
             android:textSize="16sp"/>
 
         <TextView
-            android:id="@+id/currencyQuantity"
+            android:id="@+id/cryptoQuantity"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="234,32 $"
+            android:text="0,02467863 BTC"
             android:textSize="16sp"
             android:textStyle="bold" />
     </LinearLayout>
@@ -133,10 +133,10 @@
             android:textSize="16sp"/>
 
         <TextView
-            android:id="@+id/currencyPurchaseDate"
+            android:id="@+id/cryptoPurchaseDate"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="14.01.2025"
+            android:text="28.02.2025"
             android:textSize="16sp"
             android:textStyle="bold" />
     </LinearLayout>
@@ -157,10 +157,10 @@
             android:textSize="16sp"/>
 
         <TextView
-            android:id="@+id/currencyPurchaseExchangeRate"
+            android:id="@+id/cryptoPurchaseExchangeRate"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="99,32 ₽"
+            android:text="8 231 688,22 ₽"
             android:textSize="16sp"
             android:textStyle="bold" />
     </LinearLayout>
@@ -181,10 +181,10 @@
             android:textSize="16sp"/>
 
         <TextView
-            android:id="@+id/currencyExchangeRateDynamics"
+            android:id="@+id/cryptoExchangeRateDynamics"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="-23,4 %"
+            android:text="12,7 %"
             android:textSize="16sp"
             android:textStyle="bold" />
     </LinearLayout>

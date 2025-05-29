@@ -40,7 +40,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public boolean registerUser(String phone, String password) {
         SQLiteDatabase db = this.getWritableDatabase();
         String hashedPassword = HashUtils.sha256(password);
-        Log.d("database", "registerUser " + phone + " " + password + " "  + hashedPassword);
 
         String query = "SELECT * FROM " + TABLE_USERS + " WHERE " + COLUMN_PHONE + " = ?";
         Cursor cursor = db.rawQuery(query, new String[]{phone});
@@ -63,7 +62,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public boolean checkUser(String phone, String password) {
         SQLiteDatabase db = this.getReadableDatabase();
         String hashedPassword = HashUtils.sha256(password);
-        Log.d("database", "checkUser " + phone + " " + password + " "  + hashedPassword);
 
         String query = "SELECT * FROM " + TABLE_USERS + " WHERE " +
                 COLUMN_PHONE + " = ? AND " +

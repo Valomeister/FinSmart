@@ -302,6 +302,18 @@ public class HomePageFragment extends Fragment {
                             .commit();
                 }
             });
+        } else if (label.startsWith("Крипта")) {
+            // Задаем обработчик клика на весь itemView
+            itemView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+
+                    requireActivity().getSupportFragmentManager()
+                            .beginTransaction()
+                            .replace(R.id.fragment_container, new CryptosFragment())
+                            .commit();
+                }
+            });
         }
 
         TextView labelView = itemView.findViewById(R.id.legend_label);
@@ -354,7 +366,7 @@ public class HomePageFragment extends Fragment {
                 }
             }
         } catch (IOException e) {
-            Log.d("CSV", "Ошибка чтения файла", e);
+
         }
 
         return entries;

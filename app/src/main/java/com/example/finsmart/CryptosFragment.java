@@ -1,0 +1,177 @@
+package com.example.finsmart;
+
+import android.content.Context;
+import android.os.Bundle;
+
+import androidx.core.content.ContextCompat;
+import androidx.fragment.app.Fragment;
+
+import android.util.Log;
+import android.util.TypedValue;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.TextView;
+import android.widget.Toast;
+
+import java.text.NumberFormat;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import java.util.Locale;
+
+public class CryptosFragment extends Fragment {
+
+    private HashMap<String, Integer> cryptoIconMap;
+
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                             Bundle savedInstanceState) {
+        // Inflate the layout for this fragment
+        View view = inflater.inflate(R.layout.fragment_cryptos, container, false);
+
+        setToolbar(inflater, "Крипта");
+
+        LinearLayout cryptoContainer = view.findViewById(R.id.cryptoContainer);
+        ArrayList<Crypto> cryptos =  getCryptosFromDataBase();
+        fillCryptoContainer(cryptos, cryptoContainer);
+
+        return view;
+    }
+
+    // TODO: 28.05.2025 в DepositsFragment и FundsFragment дублируется тело этого метода
+    public void setToolbar(LayoutInflater inflater, String tabName) {
+        MainActivity mainActivity = (MainActivity) requireActivity();
+        LinearLayout toolbarLinearLayout = mainActivity.toolbarLinearLayout;
+        // скрываем логотип
+        ImageView logoImageView = toolbarLinearLayout.findViewById(R.id.logo);
+        logoImageView.setVisibility(View.GONE);
+        // вставляем свой toolbar
+        View toolbarNavBack = inflater.inflate(R.layout.toolbar_nav_back, toolbarLinearLayout, false);
+        TextView toolbarNavBackTab = toolbarNavBack.findViewById(R.id.tab);
+        toolbarNavBackTab.setText(tabName);
+
+        ImageView arrowBack = toolbarNavBack.findViewById(R.id.arrowBack);
+        arrowBack.setOnClickListener(v -> {
+            // Возвращаем toolbar к исходному
+            toolbarLinearLayout.removeViewAt(1);
+            logoImageView.setVisibility(View.VISIBLE);
+
+            // Открытие HomePageFragment
+            requireActivity().getSupportFragmentManager()
+                    .beginTransaction()
+                    .replace(R.id.fragment_container, new HomePageFragment()) // R.id.fragment_container — это ID контейнера в активити
+                    .commit();
+        });
+
+
+        toolbarLinearLayout.addView(toolbarNavBack);
+    }
+
+    ArrayList<Crypto> getCryptosFromDataBase() {
+        ArrayList<Crypto> cryptos = new ArrayList<>();
+
+        // Добавляем криптовалюты с ценами в RUB, суммарная стоимость ~200 000 руб.
+        cryptos.add(new Crypto("Bitcoin", "BTC", 0.01123112, 2_500_000, 2_700_000, "15.11.2024"));     // ~27 000
+        cryptos.add(new Crypto("Ethereum", "ETH", 0.25548942, 160_000, 180_000, "10.01.2025"));       // ~36 000
+        cryptos.add(new Crypto("Solana", "SOL", 3.15125436, 8_000, 9_000, "05.02.2025"));              // ~27 000
+        cryptos.add(new Crypto("Toncoin", "TON", 950.35239124, 150, 110, "19.12.2024"));
+
+        return cryptos;
+    }
+
+    private void fillCryptoContainer(ArrayList<Crypto> cryptos, LinearLayout cryptoContainer) {
+        initCryptoIcons();
+        for (int i = 0; i < cryptos.size(); i++) {
+            boolean last = i == cryptos.size() - 1;
+            View cryptoItem = createCryptoItem(cryptos.get(i), cryptoContainer, last);
+            cryptoContainer.addView(cryptoItem);
+        }
+    }
+    private View createCryptoItem(Crypto crypto, LinearLayout  cryptoContainer, boolean last) {
+        LayoutInflater inflater = LayoutInflater.from(requireContext());
+        View item = inflater.inflate(R.layout.item_crypto, cryptoContainer, false);
+
+        // Находим все TextView в item_crypto.xml
+        TextView tvCryptoName = item.findViewById(R.id.cryptoName);
+        TextView tvCryptoConvertedSum = item.findViewById(R.id.cryptoConvertedSum);
+        TextView tvCryptoExchangeRate = item.findViewById(R.id.cryptoExchangeRate);
+        TextView tvCryptoQuantity = item.findViewById(R.id.cryptoQuantity);
+        TextView tvCryptoPurchaseDate = item.findViewById(R.id.cryptoPurchaseDate);
+        TextView tvCryptoPurchaseExchangeRate = item.findViewById(R.id.cryptoPurchaseExchangeRate);
+        TextView tvCryptoExchangeRateDynamics = item.findViewById(R.id.cryptoExchangeRateDynamics);
+        ImageView ivCryptoIcon = item.findViewById(R.id.cryptoIcon);
+        ImageView ivEditButton = item.findViewById(R.id.editButton);
+
+// Устанавливаем данные
+        tvCryptoName.setText(crypto.getName());
+
+        String formattedAmount = String.format("%,.0f ₽", crypto.getMarketValue())
+                .replace(',', ' ');
+        tvCryptoConvertedSum.setText(formattedAmount);
+
+        String formattedCurrentPrice = String.format("%,.0f ₽", crypto.getCurrentPrice())
+                .replace(',', ' ').replace('.', ',');
+        tvCryptoExchangeRate.setText(formattedCurrentPrice);
+
+        String roundedQuantity = NumberUtils.roundDecimalPartTo3SD(crypto.getQuantity());
+        String formattedQuantity = String.format("%s %s", roundedQuantity, crypto.getSymbol());
+        tvCryptoQuantity.setText(formattedQuantity);
+
+        tvCryptoPurchaseDate.setText(crypto.getPurchaseDate());
+
+        String formattedPurchasePrice = String.format("%,.0f ₽", crypto.getBuyInPrice())
+                .replace(',', ' ').replace('.', ',');
+        tvCryptoPurchaseExchangeRate.setText(formattedPurchasePrice);
+
+// Раскраска динамики: зелёный — рост, красный — падение
+        double returnPercentage = crypto.getReturnPercentage();
+        String formattedDynamics = String.format("%,.2f %%", Math.abs(returnPercentage))
+                .replace(',', ' ');
+
+        if (returnPercentage >= 0) {
+            tvCryptoExchangeRateDynamics.setText("+" + formattedDynamics);
+            tvCryptoExchangeRateDynamics.setTextColor(ContextCompat.getColor(requireContext(), android.R.color.holo_green_dark));
+        } else {
+            tvCryptoExchangeRateDynamics.setText("-" + formattedDynamics);
+            tvCryptoExchangeRateDynamics.setTextColor(ContextCompat.getColor(requireContext(), android.R.color.holo_red_dark));
+        }
+
+// Логотип криптовалюты
+        Integer iconResId = cryptoIconMap.get(crypto.getSymbol()); // или getCode(), если используется код
+
+        if (iconResId != null) {
+            ivCryptoIcon.setImageResource(iconResId);
+        } else {
+            ivCryptoIcon.setImageResource(R.drawable.bank_default_icon); // дефолтная иконка
+        }
+
+
+        if (!last) {
+            LinearLayout cryptoBody = item.findViewById(R.id.cryptoBody);
+            LinearLayout.LayoutParams params = (LinearLayout.LayoutParams) cryptoBody.getLayoutParams();
+            int marginBottomInPx = (int) TypedValue.applyDimension(
+                    TypedValue.COMPLEX_UNIT_DIP,
+                    11,
+                    requireContext().getResources().getDisplayMetrics()
+            );
+            params.setMargins(0, 0, 0, marginBottomInPx);
+            cryptoBody.setLayoutParams(params);
+        }
+
+        return item;
+    }
+
+    // TODO: 29.05.2025 Подобрать нормальные, одинаковые по размеру иконки, круглые
+    private void initCryptoIcons() {
+        cryptoIconMap = new HashMap<>();
+        cryptoIconMap.put("BTC", R.drawable.btc_icon);
+        cryptoIconMap.put("ETH", R.drawable.eth_icon);
+        cryptoIconMap.put("SOL", R.drawable.sol_icon);
+        cryptoIconMap.put("TON", R.drawable.ton_icon);
+    }
+}
