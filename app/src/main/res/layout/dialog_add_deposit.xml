@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    android:paddingTop="8dp"
+    android:paddingStart="16dp"
+    android:paddingEnd="16dp"
+    android:paddingBottom="21dp"
+    android:background="@drawable/dialog_background">
+
+    <View
+        android:id="@+id/drag_handle"
+        android:layout_width="63dp"
+        android:layout_height="4dp"
+        android:layout_gravity="center_horizontal"
+        android:background="@drawable/dialog_dragger" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Добавление вклада"
+        android:textSize="18sp"
+        android:textStyle="bold"
+        android:layout_marginVertical="32dp"
+        android:layout_gravity="center_horizontal"/>
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textSize="12sp"
+        android:paddingHorizontal="2dp"
+        android:text="Банк" />
+
+    <EditText
+        android:id="@+id/editBankName"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:inputType="textCapWords"
+        android:includeFontPadding="false"
+        android:paddingTop="4dp"
+        android:paddingHorizontal="2dp"
+        android:maxLines="1"/>
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textSize="12sp"
+        android:layout_marginTop="6dp"
+        android:paddingHorizontal="2dp"
+        android:text="Сумма вклада" />
+
+    <EditText
+        android:id="@+id/editDepositedSum"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:inputType="numberDecimal"
+        android:includeFontPadding="false"
+        android:paddingTop="4dp"
+        android:paddingHorizontal="2dp"
+        android:maxLines="1" />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textSize="12sp"
+        android:layout_marginTop="6dp"
+        android:paddingHorizontal="2dp"
+        android:text="Ставка" />
+
+    <EditText
+        android:id="@+id/editDepositRate"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:inputType="numberDecimal"
+        android:includeFontPadding="false"
+        android:paddingTop="4dp"
+        android:paddingHorizontal="2dp"
+        android:maxLines="1" />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textSize="12sp"
+        android:layout_marginTop="6dp"
+        android:paddingHorizontal="2dp"
+        android:text="Дата оформления" />
+
+    <EditText
+        android:id="@+id/editDepositDate"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:includeFontPadding="false"
+        android:paddingTop="4dp"
+        android:paddingHorizontal="2dp"
+        android:inputType="date"
+        android:maxLines="1" />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textSize="12sp"
+        android:layout_marginTop="6dp"
+        android:paddingHorizontal="2dp"
+        android:text="Срок" />
+
+    <EditText
+        android:id="@+id/editDepositTerm"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:inputType="numberDecimal"
+
+        android:includeFontPadding="false"
+        android:paddingTop="4dp"
+        android:paddingHorizontal="2dp"
+        android:maxLines="1" />
+
+    <Button
+        android:id="@+id/buttonAdd"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Добавить"
+        android:layout_marginTop="24dp"
+        android:background="@drawable/button_background"
+        android:backgroundTint="#7D70FF"
+        android:textColor="#FFFFFF"
+        android:textSize="16sp"
+        android:padding="8dp"
+        android:gravity="center"/>
+</LinearLayout>

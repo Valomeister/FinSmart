@@ -223,6 +223,7 @@ public class StocksFragment extends Fragment {
         bottomSheetDialog.show();
     }
 
+
     private void showEditStockBottomSheet(Stock stock) {
         BottomSheetDialog bottomSheetDialog = new BottomSheetDialog(requireContext());
         View dialogView = getLayoutInflater().inflate(R.layout.dialog_edit_stock, null);
