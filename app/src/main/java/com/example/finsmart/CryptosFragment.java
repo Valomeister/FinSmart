@@ -51,7 +51,10 @@ public class CryptosFragment extends Fragment {
         dbHelper = new CryptoDBHelper(requireContext());
 
         // Для заполнения пустой БД небольшим набором данных:
-//        dbHelper.populateInitialData();
+        if (dbHelper.getAllCryptos().isEmpty()) {
+            dbHelper.populateInitialData();
+
+        }
 
         cryptoContainer = fragmentView.findViewById(R.id.cryptoContainer);
         ArrayList<Crypto> cryptos =  getCryptosFromDataBase();
