@@ -1,14 +1,104 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    tools:context=".BudgetPageFragment">
+    android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    android:padding="16dp">
 
-    <!-- TODO: Update blank fragment layout -->
-    <TextView
+    <!-- Блок заголовка -->
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical">
+
+        <TextView
+            android:id="@+id/textViewHeader"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Бюджет на "
+            android:textSize="16sp"
+            android:textColor="#333" />
+
+        <TextView
+            android:id="@+id/textViewMonth"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="май"
+            android:textSize="16sp"
+            android:textColor="#7D79FF" />
+
+        <ImageView
+            android:id="@+id/imageViewDropdown"
+            android:layout_width="16dp"
+            android:layout_height="16dp"
+            android:layout_marginTop="2sp"
+            android:src="@drawable/arrow_down" />
+    </LinearLayout>
+
+
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:text="@string/hello_blank_fragment" />
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:weightSum="6">
 
-</FrameLayout>
+        <!-- Левое пустое пространство (10%) -->
+        <View
+            android:layout_width="0dp"
+            android:layout_height="1dp"
+            android:layout_weight="1" />
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="4"
+            android:orientation="vertical">
+
+            <!-- Изображение иллюстрации -->
+            <ImageView
+                android:id="@+id/createBudgetIllustration"
+                android:layout_width="match_parent"
+                android:layout_height="200dp"
+                android:layout_marginTop="16dp"
+                android:src="@drawable/budget_create_img"/>
+
+            <com.github.mikephil.charting.charts.PieChart
+                android:id="@+id/BudgetPieChart"
+                android:layout_width="match_parent"
+                android:layout_height="200dp"
+                android:layout_weight="64"/>
+
+
+            <!-- Текстовое описание -->
+            <TextView
+                android:id="@+id/budgetDescription"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Планируйте доходы и расходы в одном месте."
+                android:textSize="16sp"
+                android:textColor="#555"
+                android:gravity="center"/>
+
+            <Button
+                android:id="@+id/budgetActionButton"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="32dp"
+                android:background="@drawable/button_background"
+                android:text="Создать бюджет"
+                android:textColor="@android:color/white"/>
+        </LinearLayout>
+
+
+        <!-- Левое пустое пространство (10%) -->
+        <View
+            android:layout_width="0dp"
+            android:layout_height="1dp"
+            android:layout_weight="1" />
+    </LinearLayout>
+
+
+
+</LinearLayout>

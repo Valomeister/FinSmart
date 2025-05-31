@@ -5,7 +5,7 @@
     android:layout_height="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:fillViewport="true"
-    tools:context=".DepositsFragment">
+    tools:context=".main_activity.home_page.deposit_page.DepositsFragment">
 
     <LinearLayout
         android:id="@+id/body"

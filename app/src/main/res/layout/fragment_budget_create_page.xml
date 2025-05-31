@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:fillViewport="true">
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+
+        android:background="#F0EAFF"
+        tools:context=".main_activity.budget_page.budget_create_page.BudgetCreateFragment">
+
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:paddingHorizontal="16dp"
+            android:paddingTop="16dp"
+            android:background="#FFFFFF">
+
+            <!-- Заголовок -->
+            <TextView
+                android:id="@+id/textViewIncomesHeader"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Планируемые доходы"
+                android:textSize="14sp"
+                android:textColor="#333"
+                android:paddingBottom="4dp"
+                app:fontFamily="@font/roboto_medium"/>
+
+            <!-- RecyclerView -->
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/recyclerViewIncomes"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:nestedScrollingEnabled="false"
+                android:paddingTop="8dp" />
+
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:paddingHorizontal="16dp"
+            android:paddingTop="16dp"
+            android:layout_marginTop="11dp"
+            android:background="#FFFFFF">
+
+
+            <!-- Заголовок -->
+            <TextView
+                android:id="@+id/textViewExpensesHeader"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Планируемые расходы"
+                android:textSize="14sp"
+                android:textColor="#333"
+                android:paddingBottom="4dp"
+                app:fontFamily="@font/roboto_medium" />
+
+            <!-- RecyclerView -->
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/recyclerViewExpenses"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:nestedScrollingEnabled="false"
+                android:paddingTop="8dp" />
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/textViewChangeCategories"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="#FFFFFF"
+            android:text="Изменить категории в настройках"
+            android:textSize="14sp"
+            android:textColor="#333"
+            android:paddingVertical="16dp"
+            android:paddingHorizontal="16dp"
+            android:layout_marginTop="11dp"
+            android:clickable="true"
+            android:focusable="true"
+            android:fontFamily="@font/roboto"/>
+
+        <Button
+            android:id="@+id/createBudgetNext"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="16dp"
+            android:background="@drawable/button_background"
+            android:text="Продолжить"
+            android:textColor="@android:color/white"/>
+
+    </LinearLayout>
+
+
+
+
+</ScrollView>

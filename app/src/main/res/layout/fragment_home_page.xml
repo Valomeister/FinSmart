@@ -9,7 +9,7 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        tools:context=".HomePageFragment"
+        tools:context=".main_activity.home_page.HomePageFragment"
         android:orientation="vertical"
         android:background="#F0EAFF">
 
@@ -87,7 +87,7 @@
                     android:id="@+id/pieChart"
                     android:layout_width="1dp"
                     android:layout_height="300dp"
-                    android:layout_weight="64"></com.github.mikephil.charting.charts.PieChart>
+                    android:layout_weight="64"/>
 
                 <View
                     android:layout_width="0dp"

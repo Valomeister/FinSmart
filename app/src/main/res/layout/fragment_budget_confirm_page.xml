@@ -1,0 +1,227 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:fillViewport="true">
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+
+        android:background="#F0EAFF"
+        tools:context=".main_activity.budget_page.budget_create_page.BudgetCreateFragment">
+
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:paddingHorizontal="16dp"
+            android:paddingTop="16dp"
+            android:background="#FFFFFF">
+
+            <ImageView
+                android:id="@+id/confirmBudgetIllustration"
+                android:layout_width="match_parent"
+                android:layout_height="200dp"
+                android:layout_marginVertical="24dp"
+                android:src="@drawable/budget_confirm_img"/>
+
+            <TextView
+                android:id="@+id/confirmBudgetTitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Подведем итоги вашего бюджета на май"
+                android:gravity="center"
+                android:textSize="24sp"
+                android:layout_marginBottom="32dp"
+                app:fontFamily="@font/roboto_medium"/>
+
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:paddingHorizontal="16dp"
+            android:layout_marginTop="11dp"
+            android:background="#FFFFFF"
+            android:layout_weight="1">
+
+            <!-- Верхний padding -->
+            <View
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:layout_weight="2" />
+
+            <LinearLayout
+                android:id="@+id/budgetConfirmIncomesRow"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:paddingHorizontal="16dp">
+
+                <ImageView
+                    android:id="@+id/confirmBudgetPlusIcon"
+                    android:layout_width="52dp"
+                    android:layout_height="52dp"
+                    android:src="@drawable/round_plus_icon"/>
+
+                <TextView
+                    android:id="@+id/confirmBudgetIncomesTitle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Доходы"
+                    android:layout_gravity="center_vertical"
+                    android:textSize="16sp"
+                    android:layout_marginStart="10dp"/>
+
+                <!-- Ну типо -->
+                <View
+                    android:layout_width="0dp"
+                    android:layout_height="0dp"
+                    android:layout_weight="1" />
+
+                <TextView
+                    android:id="@+id/confirmBudgetIncomesSum"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="84 350 ₽"
+                    android:layout_gravity="center_vertical"
+                    android:textSize="16sp"
+                    android:layout_marginStart="10dp"/>
+
+            </LinearLayout>
+
+            <!-- padding -->
+            <View
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:layout_weight="1" />
+
+            <LinearLayout
+                android:id="@+id/budgetConfirmExpensesRow"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:paddingHorizontal="16dp">
+
+                <ImageView
+                    android:id="@+id/confirmBudgetMinusIcon"
+                    android:layout_width="52dp"
+                    android:layout_height="52dp"
+                    android:src="@drawable/round_minus_icon"/>
+
+                <TextView
+                    android:id="@+id/confirmBudgetExpensesTitle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Расходы"
+                    android:layout_gravity="center_vertical"
+                    android:textSize="16sp"
+                    android:layout_marginStart="10dp"/>
+
+                <!-- Ну типо -->
+                <View
+                    android:layout_width="0dp"
+                    android:layout_height="0dp"
+                    android:layout_weight="1" />
+
+                <TextView
+                    android:id="@+id/confirmBudgetExpensesSum"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="54 280 ₽"
+                    android:layout_gravity="center_vertical"
+                    android:textSize="16sp"
+                    android:layout_marginStart="10dp"/>
+
+            </LinearLayout>
+
+            <!-- padding -->
+            <View
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:layout_weight="1" />
+
+            <!-- divider -->
+            <View
+                android:id="@+id/budgetCategoryDivider"
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="#D9D9D9" />
+
+            <!-- padding -->
+            <View
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:layout_weight="1" />
+
+
+            <!-- нижний addingp -->
+            <LinearLayout
+                android:id="@+id/budgetConfirmDeltaRow"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:paddingHorizontal="16dp">
+
+                <ImageView
+                    android:id="@+id/confirmBudgetDeltaIcon"
+                    android:layout_width="52dp"
+                    android:layout_height="52dp"
+                    android:src="@drawable/round_money_icon" />
+
+                <TextView
+                    android:id="@+id/confirmBudgetDeltaSum"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_vertical"
+                    android:layout_marginStart="10dp"
+                    android:text="Остаток"
+                    android:textSize="16sp" />
+
+                <!-- Ну типо -->
+                <View
+                    android:layout_width="0dp"
+                    android:layout_height="0dp"
+                    android:layout_weight="1" />
+
+                <TextView
+                    android:id="@+id/confirmBudgetDeltaTitle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_vertical"
+                    android:layout_marginStart="10dp"
+                    android:text="30 070 ₽"
+                    android:textSize="16sp" />
+
+            </LinearLayout>
+
+            <View
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:layout_weight="2" />
+
+        </LinearLayout>
+
+
+        <Button
+            android:id="@+id/createBudgetFinish"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="16dp"
+            android:background="@drawable/button_background"
+            android:text="Сохранить"
+            android:textColor="@android:color/white"/>
+
+    </LinearLayout>
+
+
+
+
+</ScrollView>

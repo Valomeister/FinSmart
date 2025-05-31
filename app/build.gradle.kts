@@ -14,6 +14,13 @@ android {
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+        // Включаем core library desugaring
+        multiDexEnabled = true
+    }
+
+    // 🔥 Включаем поддержку java.time через desugaring
+    buildFeatures {
+        viewBinding = true // если нужно
     }
 
     buildTypes {
@@ -40,7 +47,11 @@ dependencies {
     implementation(libs.activity)
     implementation(libs.constraintlayout)
     implementation("com.github.PhilJay:MPAndroidChart:v3.1.0")
+    implementation(libs.recyclerview)
     testImplementation(libs.junit)
     androidTestImplementation(libs.ext.junit)
     androidTestImplementation(libs.espresso.core)
+
+    // Поддержка java.time для Android < API 26
+    coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.0.3")
 }
