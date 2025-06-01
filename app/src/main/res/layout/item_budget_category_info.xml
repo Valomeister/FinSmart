@@ -39,14 +39,18 @@
             android:layout_weight="1" />
 
         <!-- Сумма -->
-        <TextView
+        <EditText
             android:id="@+id/amountTextView"
+            android:minWidth="70dp"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="35 000₽"
+            android:hint="Сумма"
+            android:textColorHint="#757575"
             android:textSize="14sp"
-            android:textColor="#333"
-            android:layout_gravity="center_vertical" />
+            android:textColor="#595959"
+            android:gravity="center"
+            android:layout_gravity="center_vertical"
+            android:background="@color/white"/>
 
     </LinearLayout>
 
@@ -58,7 +62,4 @@
         android:background="#D9D9D9" />
 
 </LinearLayout>
-
-
-
 

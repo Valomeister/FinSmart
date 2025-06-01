@@ -99,4 +99,19 @@ public class CategoryProvider {
                 "Образование"
         ).contains(name);
     }
+
+    static int[] getDefaultColors() {
+        // Пример цветов (R.color должно быть заменено на ваши ресурсы)
+        int[] colors = new int[]{
+                0xFF7D79FF,
+                0xFFA8A5FF,
+                0xFFAB8BFA,
+                0xFFCE9EF9,
+                0xFFE4C7FE,
+                0xFFDCCEFF,
+                0xFFF0EAFF,
+        };
+
+        return colors;
+    }
 }

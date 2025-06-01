@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    android:gravity="center_vertical">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:paddingVertical="12dp"
+        android:paddingHorizontal="16dp">
+
+        <!-- Текст -->
+        <TextView
+            android:id="@+id/titleTextView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Зарплата"
+            android:textSize="14sp"
+            android:textColor="#4D4D4D"
+            android:layout_gravity="center_vertical"/>
+
+        <!-- Пустое пространство -->
+        <View
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_weight="1" />
+
+        <!-- Сумма -->
+        <TextView
+            android:id="@+id/spentSum"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="35 000 ₽"
+            android:textSize="14sp"
+            android:textColor="#E28126"
+            android:gravity="center"
+            android:layout_gravity="center_vertical"
+            android:background="@color/white"
+            app:fontFamily="@font/roboto_medium"/>
+        <!-- Сумма -->
+        <TextView
+            android:id="@+id/outOf"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text=" из "
+            android:textSize="14sp"
+            android:textColor="#4D4D4D"
+            android:gravity="center"
+            android:layout_gravity="center_vertical"
+            android:background="@color/white"/>
+        <!-- Сумма -->
+        <TextView
+            android:id="@+id/plannedSum"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="55 000 ₽"
+            android:textSize="14sp"
+                android:textColor="#4D4D4D"
+            android:gravity="center"
+            android:layout_gravity="center_vertical"
+            android:background="@color/white"
+            app:fontFamily="@font/roboto_medium"/>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:weightSum="1"
+        android:paddingHorizontal="16dp">
+
+        <!-- divider -->
+        <View
+            android:id="@+id/progressBarFilled"
+            android:layout_width="0dp"
+            android:layout_height="3dp"
+            android:background="#E28126"
+            android:layout_weight="0.67"/>
+
+        <!-- divider -->
+        <View
+            android:id="@+id/progressBarEmpty"
+            android:layout_width="0dp"
+            android:layout_height="1dp"
+            android:background="#FF0000"
+            android:layout_gravity="end"/>
+
+    </LinearLayout>
+
+</LinearLayout>

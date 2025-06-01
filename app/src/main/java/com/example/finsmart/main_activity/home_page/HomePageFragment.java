@@ -18,6 +18,8 @@ import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.example.finsmart.data.database.AppDatabase;
+import com.example.finsmart.data.repository.AppRepository;
 import com.example.finsmart.main_activity.home_page.crypto_page.CryptosFragment;
 import com.example.finsmart.main_activity.home_page.currency_page.CurrenciesFragment;
 import com.example.finsmart.main_activity.home_page.deposit_page.DepositsFragment;
@@ -52,6 +54,8 @@ public class HomePageFragment extends Fragment {
     LineChart lineChart;
     private boolean isAnimationRunning = false;
     View view;
+
+    private AppRepository repository;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -101,6 +105,24 @@ public class HomePageFragment extends Fragment {
 
         // Изначальная подгрузка графика в интервале "1Г"
         onTimeRangeClicked(view.findViewById(R.id.btn1Y));
+
+
+
+        // Получаем доступ к БД
+        AppDatabase db = AppDatabase.getInstance(requireContext());
+
+        // Создаём Repository
+        repository = new AppRepository(
+                db.userDao(),
+                db.budgetDao(),
+                db.categoryDao(),
+                db.operationDao(),
+                db
+        );
+
+        // Запускаем заполнение тестовыми данными
+        repository.populateWithTestData();
+
 
         return view;
     }

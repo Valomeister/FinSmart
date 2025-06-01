@@ -1,10 +1,10 @@
 package com.example.finsmart.main_activity.budget_page;
 
+import android.graphics.Color;
+import android.graphics.Typeface;
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
 
 import android.view.LayoutInflater;
 import android.view.View;
@@ -14,18 +14,20 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.example.finsmart.R;
+import com.example.finsmart.main_activity.CurrencyUtils;
 import com.example.finsmart.main_activity.budget_page.budget_create_page.BudgetCreateFragment;
-import com.example.finsmart.main_activity.budget_page.budget_create_page.IncomeAdapter;
-import com.example.finsmart.main_activity.budget_page.budget_create_page.IncomeItem;
 import com.example.finsmart.main_activity.budget_page.budget_details_page.BudgetDetailsPage;
 import com.github.mikephil.charting.charts.PieChart;
+import com.github.mikephil.charting.data.PieData;
+import com.github.mikephil.charting.data.PieDataSet;
+import com.github.mikephil.charting.data.PieEntry;
 
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
+
 public class BudgetPageFragment extends Fragment {
+
     View view;
     BudgetDBHelper dbHelper;
 
@@ -37,6 +39,7 @@ public class BudgetPageFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+
 
         // Inflate the layout for this fragment
         view = inflater.inflate(R.layout.fragment_budget_page, container, false);
@@ -50,7 +53,7 @@ public class BudgetPageFragment extends Fragment {
         dbHelper = new BudgetDBHelper(requireContext());
         dbHelper.clearAllData();
 //        dbHelper.populateInitialData();
-        dbHelper.printAllData();
+//        dbHelper.printAllData();
 
         loadBudgetSection();
 
@@ -58,7 +61,7 @@ public class BudgetPageFragment extends Fragment {
     }
 
     void loadBudgetSection() {
-        String currentMonth = getCurrentMonth();
+        String currentMonth = BudgetUtils.getCurrentMonth();
         if (dbHelper.getBudgetByMonth(currentMonth) == null)  {
             // Бюджета на текущий месяц нет
             loadCreateBudgetSection(currentMonth);
@@ -69,19 +72,6 @@ public class BudgetPageFragment extends Fragment {
         }
 
 
-    }
-
-    String getCurrentMonth() {
-        // Получаем текущую дату
-        LocalDate currentDate = LocalDate.now();
-
-        // Создаём форматтер для нужного вида: MM/yyyy
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MM/yyyy");
-
-        // Форматируем дату
-        String formattedDate = currentDate.format(formatter);
-
-        return formattedDate;
     }
 
     void loadCreateBudgetSection(String month) {
@@ -101,7 +91,6 @@ public class BudgetPageFragment extends Fragment {
 
     }
 
-
     void loadExistingBudgetInfo(String month) {
         createBudgetIllustration.setVisibility(View.GONE);
         budgetDescriptionTextView.setVisibility(View.GONE);
@@ -115,9 +104,49 @@ public class BudgetPageFragment extends Fragment {
                     .addToBackStack(null)  // добавляем в back stack (чтобы можно было вернуться)
                     .commit();
         });
+
+        Budget CurrentBudget = dbHelper.getBudgetByMonth(BudgetUtils.getCurrentMonth());
+        setupPieChart(CurrentBudget);
     }
 
+    private void setupPieChart(Budget budget) {
+        List<PieEntry> entries = new ArrayList<>();
 
+        // Доходы
+        for (ExpenseEntry income : budget.getExpenseList()) {
+            if (income.getAmount() > 0) {
+                entries.add(new PieEntry((float) income.getAmount(), income.getName()));
+            }
+        }
+
+        // Настройка набора данных
+        PieDataSet dataSet = new PieDataSet(entries, "Расходы");
+        dataSet.setDrawValues(false);
+        dataSet.setColors(CategoryProvider.getDefaultColors());
+        dataSet.setValueTextColor(Color.BLACK);
+        dataSet.setValueTextSize(14f);
+
+
+
+        // Нагоняем стиля
+        BudgetPieChart.setDrawEntryLabels(false);      // Надписи у секторов
+        BudgetPieChart.getLegend().setEnabled(false);  // Легенда
+        BudgetPieChart.getDescription().setEnabled(false); // Описание
+        BudgetPieChart.setTransparentCircleAlpha(0); // Устанавливаем полную прозрачность
+        BudgetPieChart.setHoleRadius(76f); // 76% радиуса (размер отверстия в центре)
+        String budgetExpensesFormatted = CurrencyUtils.formatDoubleToString
+                (budget.getTotalExpenses(), 0);
+        BudgetPieChart.setCenterText(budgetExpensesFormatted);
+        BudgetPieChart.setCenterTextSize(22f); // Размер в dp
+        BudgetPieChart.setCenterTextTypeface(Typeface.DEFAULT_BOLD);
+        BudgetPieChart.setCenterTextColor(Color.parseColor("#4D4D4D"));
+
+
+        // Настройка самой диаграммы
+        PieData pieData = new PieData(dataSet);
+        BudgetPieChart.setData(pieData);
+        BudgetPieChart.invalidate();
+    }
 
 
 }

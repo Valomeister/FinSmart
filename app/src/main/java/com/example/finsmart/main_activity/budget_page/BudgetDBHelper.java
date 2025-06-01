@@ -83,8 +83,25 @@ public class BudgetDBHelper extends SQLiteOpenHelper {
     public long addBudget(Budget budget) {
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues values = new ContentValues();
+
+        // Insert the budget
         values.put(COLUMN_MONTH, budget.getMonth());
-        return db.insert(TABLE_BUDGET, null, values);
+        long budgetId = db.insert(TABLE_BUDGET, null, values);
+
+        // If budget was inserted successfully, proceed with its entries
+        if (budgetId != -1) {
+            // Add all income entries
+            for (IncomeEntry income : budget.getIncomeList()) {
+                addIncomeEntry(income, (int) budgetId);
+            }
+
+            // Add all expense entries
+            for (ExpenseEntry expense : budget.getExpenseList()) {
+                addExpenseEntry(expense, (int) budgetId);
+            }
+        }
+
+        return budgetId;
     }
 
     public Budget getBudgetByMonth(String month) {
@@ -98,7 +115,12 @@ public class BudgetDBHelper extends SQLiteOpenHelper {
             int id = cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_BUDGET_ID));
             String monthFound = cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_MONTH));
             cursor.close();
-            return new Budget(id, monthFound);
+
+            Budget budget = new Budget(id, monthFound);
+            budget.getIncomeList().addAll(getIncomesForBudget(id));
+            budget.getExpenseList().addAll(getExpensesForBudget(id));
+
+            return budget;
         }
         return null;
     }
@@ -225,48 +247,52 @@ public class BudgetDBHelper extends SQLiteOpenHelper {
         List<Budget> budgets = getAllBudgets();
 
         if (budgets.isEmpty()) {
-            Log.d("BudgetDB", "База данных пуста.");
+            Log.d("tmp", "База данных пуста.");
             return;
         }
 
         for (Budget budget : budgets) {
-            Log.d("BudgetDB", "==============================");
-            Log.d("BudgetDB", "Месяц: " + budget.getMonth());
-            Log.d("BudgetDB", "ID бюджета: " + budget.getId());
-
-            // Доходы
-            List<IncomeEntry> incomes = getIncomesForBudget(budget.getId());
-            Log.d("BudgetDB", "-- Доходы:");
-            if (incomes.isEmpty()) {
-                Log.d("BudgetDB", "   Нет записей");
-            } else {
-                for (IncomeEntry income : incomes) {
-                    Log.d("BudgetDB", "   - " + income.getName() + ": " + income.getAmount() + " ₽");
-                }
-            }
-
-            // Расходы
-            List<ExpenseEntry> expenses = getExpensesForBudget(budget.getId());
-            Log.d("BudgetDB", "-- Расходы:");
-            if (expenses.isEmpty()) {
-                Log.d("BudgetDB", "   Нет записей");
-            } else {
-                for (ExpenseEntry expense : expenses) {
-                    Log.d("BudgetDB", "   - " + expense.getName() + ": " + expense.getAmount() + " ₽");
-                }
-            }
-
-            double totalIncome = incomes.stream().mapToDouble(IncomeEntry::getAmount).sum();
-            double totalExpense = expenses.stream().mapToDouble(ExpenseEntry::getAmount).sum();
-            double net = totalIncome - totalExpense;
-
-            Log.d("BudgetDB", "-- Итого:");
-            Log.d("BudgetDB", "   Доходы: " + totalIncome + " ₽");
-            Log.d("BudgetDB", "   Расходы: " + totalExpense + " ₽");
-            Log.d("BudgetDB", "   Чистый бюджет: " + net + " ₽");
+            printBudget(budget);
         }
 
-        Log.d("BudgetDB", "==============================");
+        Log.d("tmp", "==============================");
+    }
+
+    public void printBudget(Budget budget) {
+        Log.d("tmp", "==============================");
+        Log.d("tmp", "Месяц: " + budget.getMonth());
+        Log.d("tmp", "ID бюджета: " + budget.getId());
+
+        // Доходы
+        List<IncomeEntry> incomes = budget.getIncomeList();
+        Log.d("tmp", "-- Доходы:");
+        if (incomes.isEmpty()) {
+            Log.d("tmp", "   Нет записей");
+        } else {
+            for (IncomeEntry income : incomes) {
+                Log.d("tmp", "   - " + income.getName() + ": " + income.getAmount() + " ₽");
+            }
+        }
+
+        // Расходы
+        List<ExpenseEntry> expenses = budget.getExpenseList();
+        Log.d("tmp", "-- Расходы:");
+        if (expenses.isEmpty()) {
+            Log.d("tmp", "   Нет записей");
+        } else {
+            for (ExpenseEntry expense : expenses) {
+                Log.d("tmp", "   - " + expense.getName() + ": " + expense.getAmount() + " ₽");
+            }
+        }
+
+        double totalIncome = incomes.stream().mapToDouble(IncomeEntry::getAmount).sum();
+        double totalExpense = expenses.stream().mapToDouble(ExpenseEntry::getAmount).sum();
+        double net = totalIncome - totalExpense;
+
+        Log.d("tmp", "-- Итого:");
+        Log.d("tmp", "   Доходы: " + totalIncome + " ₽");
+        Log.d("tmp", "   Расходы: " + totalExpense + " ₽");
+        Log.d("tmp", "   Чистый бюджет: " + net + " ₽");
     }
 
     public List<Budget> getAllBudgets() {

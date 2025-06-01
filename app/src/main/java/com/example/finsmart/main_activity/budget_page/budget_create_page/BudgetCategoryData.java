@@ -1,12 +1,12 @@
 package com.example.finsmart.main_activity.budget_page.budget_create_page;
 
-public class ExpenseItem {
+public class BudgetCategoryData {
     private String emoji;
     private String title;
     private String amount;
     private boolean isLast;
 
-    public ExpenseItem(String emoji, String title, String amount, boolean isLast) {
+    public BudgetCategoryData(String emoji, String title, String amount, boolean isLast) {
         this.emoji = emoji;
         this.title = title;
         this.amount = amount;
@@ -27,5 +27,9 @@ public class ExpenseItem {
 
     public Boolean isLast() {
         return isLast;
+    }
+
+    public void setAmount(String amount) {
+        this.amount = amount;
     }
 }

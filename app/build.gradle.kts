@@ -54,4 +54,8 @@ dependencies {
 
     // Поддержка java.time для Android < API 26
     coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.0.3")
+
+    // Room
+    implementation("androidx.room:room-runtime:2.6.1")
+    annotationProcessor("androidx.room:room-compiler:2.6.1") // для Java
 }

@@ -11,7 +11,8 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:gravity="center_vertical">
+        android:gravity="center_vertical"
+        android:layout_margin="16dp">
 
         <TextView
             android:id="@+id/textViewHeader"
@@ -61,7 +62,6 @@
                 android:id="@+id/createBudgetIllustration"
                 android:layout_width="match_parent"
                 android:layout_height="200dp"
-                android:layout_marginTop="16dp"
                 android:src="@drawable/budget_create_img"/>
 
             <com.github.mikephil.charting.charts.PieChart

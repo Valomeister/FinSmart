@@ -1,14 +1,77 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".main_activity.budget_page.budget_details_page.BudgetDetailsPage">
-
-    <!-- TODO: Update blank fragment layout -->
-    <TextView
+    android:fillViewport="true">
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:text="bufget details fragment" />
+        android:layout_height="wrap_content"
+        tools:context=".main_activity.home_page.HomePageFragment"
+        android:orientation="vertical"
+        android:background="#FFFFFF"
+        android:paddingTop="42dp">
 
-</FrameLayout>
+        <!-- Заголовок -->
+        <TextView
+            android:id="@+id/budgetDetailsHeader"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Сводка доходов"
+            android:textSize="24sp"
+            android:textColor="#4D4D4D"
+            android:layout_gravity="center_vertical"
+            app:fontFamily="@font/roboto_medium"
+            android:gravity="center"/>
+
+        <!-- RecyclerView -->
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/recyclerView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:nestedScrollingEnabled="false"
+            android:paddingTop="8dp"
+            android:layout_weight="1"/>
+
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            tools:context=".main_activity.home_page.HomePageFragment"
+            android:orientation="horizontal"
+            android:background="#FFFFFF"
+            android:layout_margin="16dp">
+
+            <Button
+                android:id="@+id/BudgetDetailsIncomes"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Доходы"
+                android:background="@drawable/button_background"
+                android:backgroundTint="#7D70FF"
+                android:textColor="#FFFFFF"
+                android:textSize="16sp"
+                android:padding="8dp"
+                android:gravity="center"
+                android:layout_weight="1"/>
+
+
+
+            <Button
+                android:id="@+id/BudgetDetailsExpenses"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Расходы"
+                android:background="@drawable/button_background"
+                android:backgroundTint="#7D70FF"
+                android:textColor="#FFFFFF"
+                android:textSize="16sp"
+                android:padding="8dp"
+                android:gravity="center"
+                android:layout_weight="1"/>
+
+        </LinearLayout>
+    </LinearLayout>
+</ScrollView>
