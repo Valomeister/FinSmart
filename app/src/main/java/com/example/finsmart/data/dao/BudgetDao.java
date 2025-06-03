@@ -1,5 +1,6 @@
 package com.example.finsmart.data.dao;
 
+import androidx.lifecycle.LiveData;
 import androidx.room.Dao;
 import androidx.room.Insert;
 import androidx.room.Query;
@@ -17,8 +18,10 @@ public interface BudgetDao {
     List<Budget> getAllBudgetsForUser(int userId);
 
     @Query("SELECT * FROM budget_table WHERE user_id = :userId AND month = :month LIMIT 1")
-    Budget getBudgetByMonthForUser(int userId, String month);
+    LiveData<Budget> getBudgetByMonthForUser(int userId, String month);
 
     @Query("DELETE FROM budget_table")
     void clearAllTables();
+
+
 }

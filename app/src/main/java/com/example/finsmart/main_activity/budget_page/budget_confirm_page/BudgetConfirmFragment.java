@@ -4,6 +4,8 @@ import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
+import androidx.lifecycle.LiveData;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -16,13 +18,15 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.example.finsmart.R;
+import com.example.finsmart.data.database.AppDatabase;
+import com.example.finsmart.data.model.Budget;
+import com.example.finsmart.data.model.Category;
+import com.example.finsmart.data.model.common.CategoryType;
+import com.example.finsmart.data.repository.AppRepository;
 import com.example.finsmart.main_activity.CurrencyUtils;
-import com.example.finsmart.main_activity.budget_page.Budget;
-import com.example.finsmart.main_activity.budget_page.BudgetDBHelper;
 import com.example.finsmart.main_activity.budget_page.BudgetPageFragment;
 import com.example.finsmart.main_activity.budget_page.BudgetUtils;
-import com.example.finsmart.main_activity.budget_page.ExpenseEntry;
-import com.example.finsmart.main_activity.budget_page.IncomeEntry;
+import com.example.finsmart.main_activity.budget_page.SharedBudgetViewModel;
 import com.github.mikephil.charting.charts.PieChart;
 
 import java.util.ArrayList;
@@ -32,8 +36,14 @@ public class BudgetConfirmFragment extends Fragment {
     View view;
     Button createBudgetFinish;
     TextView confirmBudgetIncomesSum, confirmBudgetExpensesSum, confirmBudgetDeltaTitle;
-    BudgetDBHelper dbHelper;
-    Budget receivedBudget;
+
+    AppRepository appRepository;
+    AppDatabase appDatabase;
+
+    Budget draftBudget;
+    List<Category> draftCategories;
+
+    SharedBudgetViewModel sharedViewModel;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -42,11 +52,21 @@ public class BudgetConfirmFragment extends Fragment {
         // Inflate the layout for this fragment
         view = inflater.inflate(R.layout.fragment_budget_confirm_page, container, false);
 
-        dbHelper = new BudgetDBHelper(requireContext());
+        appDatabase = AppDatabase.getInstance(requireContext());
 
-        initUI();
+        appRepository = new AppRepository(
+                appDatabase.userDao(),
+                appDatabase.budgetDao(),
+                appDatabase.categoryDao(),
+                appDatabase.operationDao(),
+                appDatabase
+        );
+
+        sharedViewModel = new ViewModelProvider(requireActivity()).get(SharedBudgetViewModel.class);
 
         updateBudgetData();
+
+        initUI();
 
         initCreateBudgetButton();
 
@@ -66,45 +86,73 @@ public class BudgetConfirmFragment extends Fragment {
 
     public void initCreateBudgetButton() {
         createBudgetFinish.setOnClickListener(v -> {
+            Log.d("tmp", "awating");
+            sharedViewModel.getBudgetWithCategories().observe(getViewLifecycleOwner(), budgetWithCategories -> {
+                Log.d("tmp", "got it");
 
 
-            Budget existingBudget = dbHelper.getBudgetByMonth(receivedBudget.getMonth());
+                Budget budget = budgetWithCategories.first;
+                List<Category> categories = budgetWithCategories.second;
 
-            if (existingBudget == null) {
-                long newBudgetId = dbHelper.addBudget(receivedBudget);
-                Log.d("tmp", "Добавлен бюджет — " + receivedBudget.getMonth());
+                // Сохраняем в БД
+                new Thread(() -> {
+                    appRepository.insertBudgetWithCategories(budget, categories);
+                    appRepository.printDatabaseContent();
 
+                    // Переключаемся обратно на UI-поток
+                    requireActivity().runOnUiThread(() -> {
+                        // Удаляем предыдущий стек
+                        requireActivity().getSupportFragmentManager().popBackStack("BudgetPageFragmentTag", FragmentManager.POP_BACK_STACK_INCLUSIVE);
+                    });
 
-            } else {
-                // Optional: Handle case where budget already exists
-                Log.d("tmp", "Budget for " + receivedBudget.getMonth() + " already exists.");
-                // You could choose to update it instead or notify the user
-            }
+                }).start();
+            });
 
-
-
-            // Удаляем весь стек до фрагмента с тегом "fragment_1_tag"
-            requireActivity().getSupportFragmentManager().popBackStack("BudgetPageFragmentTag", FragmentManager.POP_BACK_STACK_INCLUSIVE);
 
         });
     }
 
     private void updateBudgetData() {
-        if (getArguments() != null) {
-            receivedBudget = getArguments().getParcelable("budget");
-            if (receivedBudget != null) {
-                String incomesSumFormatted = CurrencyUtils.formatDoubleToString
-                        (receivedBudget.getTotalIncome(), 0);
-                String expensesSumFormatted = CurrencyUtils.formatDoubleToString
-                        (receivedBudget.getTotalExpenses(), 0);
-                String deltaSumFormatted = CurrencyUtils.formatDoubleToString
-                        (receivedBudget.getNetBudget() , 0);
 
-                confirmBudgetIncomesSum.setText(incomesSumFormatted);
-                confirmBudgetExpensesSum.setText(expensesSumFormatted);
-                confirmBudgetDeltaTitle.setText(deltaSumFormatted);
+
+        // Получаем данные
+        sharedViewModel.getBudget().observe(getViewLifecycleOwner(), budget -> {
+            draftBudget = budget;
+            // Показываем подтверждение
+        });
+
+        sharedViewModel.getCategories().observe(getViewLifecycleOwner(), categories -> {
+            draftCategories = categories;
+            // Показываем категории
+            int incomesSum = getIncomeSum(categories);
+            int expensesSum = getExpenseSum(categories);
+            int deltaSum = incomesSum - expensesSum;
+
+            confirmBudgetIncomesSum.setText(String.valueOf(incomesSum));
+            confirmBudgetExpensesSum.setText(String.valueOf(expensesSum));
+            confirmBudgetDeltaTitle.setText(String.valueOf(deltaSum));
+        });
+
+    }
+
+    int getIncomeSum(List<Category> categories) {
+        int sum = 0;
+        for (Category category : categories) {
+            if (category.getType() == CategoryType.INCOME) {
+                sum += category.getPlannedLimit();
             }
         }
+        return sum;
+    }
+
+    int getExpenseSum(List<Category> categories) {
+        int sum = 0;
+        for (Category category : categories) {
+            if (category.getType() == CategoryType.EXPENSE) {
+                sum += category.getPlannedLimit();
+            }
+        }
+        return sum;
     }
 
 

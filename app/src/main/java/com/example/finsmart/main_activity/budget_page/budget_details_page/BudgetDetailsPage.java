@@ -9,12 +9,10 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.example.finsmart.R;
-import com.example.finsmart.main_activity.budget_page.BudgetDBHelper;
 
 public class BudgetDetailsPage extends Fragment {
 
     View view;
-    BudgetDBHelper dbHelper;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -24,7 +22,7 @@ public class BudgetDetailsPage extends Fragment {
         // Inflate the layout for this fragment
         view = inflater.inflate(R.layout.fragment_budget_details_page, container, false);
 
-        dbHelper = new BudgetDBHelper(requireContext());
+
 
         return view;
     }

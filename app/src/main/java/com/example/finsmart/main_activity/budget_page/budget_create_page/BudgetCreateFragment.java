@@ -3,6 +3,7 @@ package com.example.finsmart.main_activity.budget_page.budget_create_page;
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -12,24 +13,32 @@ import android.view.ViewGroup;
 import android.widget.Button;
 
 import com.example.finsmart.R;
-import com.example.finsmart.main_activity.CurrencyUtils;
-import com.example.finsmart.main_activity.budget_page.Budget;
-import com.example.finsmart.main_activity.budget_page.BudgetDBHelper;
+import com.example.finsmart.data.database.AppDatabase;
+import com.example.finsmart.data.model.Budget;
+import com.example.finsmart.data.model.Category;
+import com.example.finsmart.data.provider.CategoryProvider;
+import com.example.finsmart.data.repository.AppRepository;
+import com.example.finsmart.main_activity.budget_page.SharedBudgetViewModel;
 import com.example.finsmart.main_activity.budget_page.BudgetUtils;
 import com.example.finsmart.main_activity.budget_page.budget_confirm_page.BudgetConfirmFragment;
 
-import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.List;
 
 public class BudgetCreateFragment extends Fragment {
     View view;
     Button createBudgetNext;
-//    BudgetDBHelper dbHelper;
-    BudgetCategoryDataAdapter expenseAdapter;
+
+
+    Budget draftBudget;
+    List<Category> draftIncomeCategories;
+    List<Category> draftExpenseCategories;
+
+
     BudgetCategoryDataAdapter incomeAdapter;
-    List<BudgetCategoryData> incomeItems;
-    List<BudgetCategoryData> expenseItems;
+    BudgetCategoryDataAdapter expenseAdapter;
+
+
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -38,10 +47,8 @@ public class BudgetCreateFragment extends Fragment {
         // Inflate the layout for this fragment
         view = inflater.inflate(R.layout.fragment_budget_create_page, container, false);
 
-//        dbHelper = new BudgetDBHelper(requireContext());
+        loadCategoriesRecyclerView();
 
-        loadIncomesRecyclerView();
-        loadExpensesRecyclerView();
 
         initUI();
 
@@ -51,46 +58,43 @@ public class BudgetCreateFragment extends Fragment {
     private void initUI() {
         createBudgetNext = view.findViewById(R.id.createBudgetNext);
         createBudgetNext.setOnClickListener(v -> {
+            // Получаем обновлённые категории из адаптера
+            List<Category> updatedIncomes = incomeAdapter.getUpdatedCategories();
+            List<Category> updatedExpenses = expenseAdapter.getUpdatedCategories();
+            List<Category> updatedCategories = new ArrayList<>();
+            updatedCategories.addAll(updatedIncomes);
+            updatedCategories.addAll(updatedExpenses);
 
+            // Сохраняем их во ViewModel
+            SharedBudgetViewModel sharedBudgetViewModel = new ViewModelProvider(requireActivity())
+                    .get(SharedBudgetViewModel.class);
 
-            Budget budget = new Budget(BudgetUtils.getCurrentMonth());
+            sharedBudgetViewModel.setCategories(updatedCategories);
+            sharedBudgetViewModel.setBudget(draftBudget);
 
-            for (BudgetCategoryData item : incomeItems) {
-                String incomeTitle = item.getTitle();
-                double incomeAmount = 0;
-                try {
-                    incomeAmount = CurrencyUtils.parseStringToDouble(item.getAmount());
-                } catch (ParseException e) {
-                    throw new RuntimeException(e);
-                }
-                budget.addIncome(incomeTitle, incomeAmount);
-            }
-
-            for (BudgetCategoryData item : expenseItems) {
-                String expenseTitle = item.getTitle();
-                double expenseAmount = 0;
-                try {
-                    expenseAmount = CurrencyUtils.parseStringToDouble(item.getAmount());
-                } catch (ParseException e) {
-                    throw new RuntimeException(e);
-                }
-                budget.addExpense(expenseTitle, expenseAmount);
-            }
-
-            BudgetConfirmFragment resultFragment = new BudgetConfirmFragment();
-            Bundle args = new Bundle();
-            args.putParcelable("budget", budget);
-            resultFragment.setArguments(args);
-
-            // Переключаемся на BudgetConfirmFragment
-            getParentFragmentManager().beginTransaction()
-                    .replace(R.id.fragment_container, resultFragment) // заменяем текущий фрагмент
-                    .addToBackStack(null)  // добавляем в back stack (чтобы можно было вернуться)
+            // Переход на следующий фрагмент
+            requireActivity().getSupportFragmentManager()
+                    .beginTransaction()
+                    .replace(R.id.fragment_container, new BudgetConfirmFragment())
+                    .addToBackStack(null)
                     .commit();
         });
     }
 
-    void loadIncomesRecyclerView() {
+
+
+    void loadCategoriesRecyclerView() {
+        draftBudget = new Budget(1, BudgetUtils.getCurrentMonth());
+        CategoryProvider.DefaultCategoryProvider categoryProvider =
+                new CategoryProvider.DefaultCategoryProvider();
+        draftIncomeCategories = categoryProvider.getIncomeCategories(0);
+        draftExpenseCategories = categoryProvider.getExpenseCategories(0);
+
+        loadIncomesRecyclerView(draftIncomeCategories);
+        loadExpensesRecyclerView(draftExpenseCategories);
+    }
+
+    void loadIncomesRecyclerView(List<Category> incomeCategories) {
         // Получаем RecyclerView
         RecyclerView recyclerView = view.findViewById(R.id.recyclerViewIncomes);
 
@@ -102,23 +106,12 @@ public class BudgetCreateFragment extends Fragment {
             }
         });
 
-        // Данные для списка
-        incomeItems = new ArrayList<>();
-        incomeItems.add(new BudgetCategoryData("\uD83D\uDCBC", "Зарплата",
-                "65 000₽", false));
-        incomeItems.add(new BudgetCategoryData("\uD83D\uDDA5\uFE0F", "Фриланс",
-                "10 000₽", false));
-        incomeItems.add(new BudgetCategoryData("\uD83D\uDCC8", "Вклады и облигации",
-                "9 350₽", false));
-        incomeItems.add(new BudgetCategoryData("\uD83E\uDDE9", "Другое",
-                "5 000₽", true));
-
-        // Создаем адаптер и устанавливаем его
-        incomeAdapter = new BudgetCategoryDataAdapter(incomeItems);
+        incomeAdapter = new BudgetCategoryDataAdapter(incomeCategories);
         recyclerView.setAdapter(incomeAdapter);
+
     }
 
-    void loadExpensesRecyclerView() {
+    void loadExpensesRecyclerView(List<Category> expenseCategories) {
         // Получаем RecyclerView
         RecyclerView recyclerView = view.findViewById(R.id.recyclerViewExpenses);
 
@@ -130,23 +123,8 @@ public class BudgetCreateFragment extends Fragment {
             }
         });
 
-        // Данные для списка
-        expenseItems = new ArrayList<>();
-        expenseItems.add(new BudgetCategoryData("\uD83C\uDFE0", "Аренда",
-                "65 000₽", false));
-        expenseItems.add(new BudgetCategoryData("\uD83E\uDD69", "Питание",
-                "10 000₽", false));
-        expenseItems.add(new BudgetCategoryData("\uD83C\uDF89", "Развлечения",
-                "9 350₽", false));
-        expenseItems.add(new BudgetCategoryData("\uD83D\uDC55", "Одежда",
-                "8 000₽", false));
-        expenseItems.add(new BudgetCategoryData("\uD83D\uDE97", "Транспорт",
-                "7 500₽", false));
-        expenseItems.add(new BudgetCategoryData("\uD83D\uDCDE", "Связь",
-                "2 000₽", true));
 
-        // Создаем адаптер и устанавливаем его
-        expenseAdapter = new BudgetCategoryDataAdapter(expenseItems);
+        expenseAdapter = new BudgetCategoryDataAdapter(expenseCategories);
         recyclerView.setAdapter(expenseAdapter);
     }
 

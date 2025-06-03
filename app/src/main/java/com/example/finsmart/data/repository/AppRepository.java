@@ -3,6 +3,7 @@ package com.example.finsmart.data.repository;
 import android.util.Log;
 
 import androidx.lifecycle.LiveData;
+import androidx.lifecycle.MutableLiveData;
 
 import com.example.finsmart.data.dao.BudgetDao;
 import com.example.finsmart.data.dao.CategoryDao;
@@ -18,6 +19,7 @@ import com.example.finsmart.data.provider.CategoryProvider;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicLong;
 
 public class AppRepository {
 
@@ -26,6 +28,8 @@ public class AppRepository {
     private final CategoryDao categoryDao;
     private final OperationDao operationDao;
     private final AppDatabase database;
+
+    private MutableLiveData<Long> newBudgetId = new MutableLiveData<>();
 
     // Конструктор
     public AppRepository(UserDao userDao, BudgetDao budgetDao, CategoryDao categoryDao,
@@ -52,24 +56,46 @@ public class AppRepository {
         return budgetDao.insert(budget);
     }
 
+    public void insertBudgetWithCategories(Budget budget, List<Category> categories) {
+        // Очистка БД
+        database.clearAllTables();
+        database.getOpenHelper().getWritableDatabase()
+                .execSQL("DELETE FROM sqlite_sequence");
+
+        // Добавляем пользователя
+        User user = new User("Valery");
+        userDao.insert(user);
+
+        // Сначала бюджет
+        long budgetId = budgetDao.insert(budget);
+
+        // Обновляем категории с новым budgetId
+        for (Category category : categories) {
+            category.setBudgetId((int) budgetId);
+        }
+
+        categoryDao.insertAll(categories);
+    }
+
     public List<Budget> getAllBudgetsForUser(int userId) {
         return budgetDao.getAllBudgetsForUser(userId);
     }
 
-    public Budget getBudgetByMonthForUser(int userId, String month) {
-        return budgetDao.getBudgetByMonthForUser(userId, month);
+    public LiveData<Budget> getBudgetByMonth(String month) {
+        return budgetDao.getBudgetByMonthForUser(1, month);
     }
+
 
     // === Работа с категориями ===
     public void insertCategory(Category category) {
         categoryDao.insert(category);
     }
 
-    public List<Category> getIncomeCategoriesByBudget(int budgetId) {
+    public LiveData<List<Category>> getIncomeCategoriesByBudget(int budgetId) {
         return categoryDao.getCategoriesByBudgetAndType(budgetId, CategoryType.INCOME);
     }
 
-    public List<Category> getExpenseCategoriesByBudget(int budgetId) {
+    public LiveData<List<Category>> getExpenseCategoriesByBudget(int budgetId) {
         return categoryDao.getCategoriesByBudgetAndType(budgetId, CategoryType.EXPENSE);
     }
 
@@ -81,6 +107,10 @@ public class AppRepository {
     public List<Operation> getOperationsByCategory(int categoryId) {
         return operationDao.getOperationsByCategory(categoryId);
     }
+
+
+
+
 
     // === Тестовые данные ===
     public void populateWithTestData() {
@@ -127,12 +157,64 @@ public class AppRepository {
                     }
                 }
 
-                printDatabaseContent();
 
             } catch (Exception e) {
                 Log.e("TEST_DB", "Ошибка при заполнении тестовыми данными", e);
             }
         }).start();
+    }
+
+    public LiveData<Long> createDefaultBudget(String month) {
+        new Thread(() -> {
+            try {
+                // Очистка БД
+                database.clearAllTables();
+                database.getOpenHelper().getWritableDatabase()
+                        .execSQL("DELETE FROM sqlite_sequence");
+
+                User user = new User("Valery");
+                long userId = userDao.insert(user);
+
+                // Добавляем бюджет
+                Budget newBudget = new Budget((int) userId, month);
+                long budgetId = budgetDao.insert(newBudget);
+                newBudget.setBudgetId((int)budgetId);
+
+                // Создаём провайдер
+                CategoryProvider.DefaultCategoryProvider provider = new CategoryProvider.DefaultCategoryProvider();
+
+                // Получаем дефолтные категории
+                List<Category> expenseCategories = provider.getExpenseCategories((int)budgetId);
+                List<Category> incomeCategories = provider.getIncomeCategories((int)budgetId);
+
+                // Объединяем в один список для удобства
+                List<Category> allCategories = new ArrayList<>();
+                allCategories.addAll(expenseCategories);
+                allCategories.addAll(incomeCategories);
+
+                // Вставляем категории в БД
+                for (Category category : allCategories) {
+                    long categoryId = categoryDao.insert(category);
+                    category.setCategoryId((int) categoryId);
+                }
+
+                // === ОПЕРАЦИИ (по одной на категорию для теста) ===
+                for (Category category : allCategories) {
+                    if (category.getType() == CategoryType.EXPENSE) {
+                        operationDao.insert(new Operation(5000, category.getCategoryId()));
+                    } else if (category.getType() == CategoryType.INCOME) {
+                        operationDao.insert(new Operation(50000, category.getCategoryId()));
+                    }
+                }
+
+                newBudgetId.postValue(budgetId);
+
+            } catch (Exception e) {
+                Log.e("TEST_DB", "Ошибка при создании бюджета", e);
+            }
+        }).start();
+
+        return newBudgetId;
     }
 
     public void printDatabaseContent() {
