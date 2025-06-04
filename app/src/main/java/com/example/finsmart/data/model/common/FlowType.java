@@ -1,6 +1,6 @@
 package com.example.finsmart.data.model.common;
 
-public enum CategoryType {
+public enum FlowType {
     INCOME,
     EXPENSE
 }

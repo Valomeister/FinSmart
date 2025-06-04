@@ -15,7 +15,7 @@ import com.example.finsmart.data.model.Budget;
 import com.example.finsmart.data.model.Category;
 import com.example.finsmart.data.model.Operation;
 import com.example.finsmart.data.model.User;
-import com.example.finsmart.data.model.common.CategoryType;
+import com.example.finsmart.data.model.common.FlowType;
 import com.example.finsmart.data.provider.CategoryProvider;
 import com.example.finsmart.main_activity.budget_page.BudgetUtils;
 import com.example.finsmart.main_activity.budget_page.budget_details_page.CategoryWithTotal;
@@ -25,6 +25,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
+import java.util.concurrent.Flow;
 
 public class AppRepository {
 
@@ -127,7 +128,7 @@ public class AppRepository {
     }
 
 //    public LiveData<List<Category>> getIncomeCategoriesByBudget(int budgetId) {
-//        return categoryDao.getCategoriesByBudgetAndType(budgetId, CategoryType.INCOME);
+//        return categoryDao.getCategoriesByBudgetAndType(budgetId, FlowType.INCOME);
 //    }
 
     public LiveData<List<Category>> getIncomeCategoriesByBudget(int budgetId) {
@@ -138,7 +139,7 @@ public class AppRepository {
 
         Log.d("tmp", "Доходные категории запрошены из БД");
 
-        LiveData<List<Category>> liveDataFromDb = categoryDao.getCategoriesByBudgetAndType(budgetId, CategoryType.INCOME);
+        LiveData<List<Category>> liveDataFromDb = categoryDao.getCategoriesByBudgetAndType(budgetId, FlowType.INCOME);
 
         Observer<List<Category>> dbObserver = categories -> {
             if (categories == null || categories.isEmpty()) return;
@@ -159,7 +160,7 @@ public class AppRepository {
     }
 
 //    public LiveData<List<Category>> getExpenseCategoriesByBudget(int budgetId) {
-//        return categoryDao.getCategoriesByBudgetAndType(budgetId, CategoryType.EXPENSE);
+//        return categoryDao.getCategoriesByBudgetAndType(budgetId, FlowType.EXPENSE);
 //    }
 
     public LiveData<List<Category>> getExpenseCategoriesByBudget(int budgetId) {
@@ -170,7 +171,7 @@ public class AppRepository {
 
         Log.d("tmp", "Расходные категории запрошены из БД");
 
-        LiveData<List<Category>> liveDataFromDb = categoryDao.getCategoriesByBudgetAndType(budgetId, CategoryType.EXPENSE);
+        LiveData<List<Category>> liveDataFromDb = categoryDao.getCategoriesByBudgetAndType(budgetId, FlowType.EXPENSE);
 
         Observer<List<Category>> dbObserver = categories -> {
             if (categories == null || categories.isEmpty()) return;
@@ -190,11 +191,11 @@ public class AppRepository {
         return expenseCategoriesCache;
     }
 
-    public LiveData<List<CategoryWithTotal>> getCategoriesWithTotalByType(int budgetId, CategoryType type) {
+    public LiveData<List<CategoryWithTotal>> getCategoriesWithTotalByType(int budgetId, FlowType type) {
         MutableLiveData<List<CategoryWithTotal>> result = new MutableLiveData<>();
 
         LiveData<List<Category>> categoriesByType;
-        if (type == CategoryType.EXPENSE) {
+        if (type == FlowType.EXPENSE) {
             categoriesByType = getExpenseCategoriesByBudget(budgetId);
         } else {
             categoriesByType = getIncomeCategoriesByBudget(budgetId);
@@ -265,6 +266,10 @@ public class AppRepository {
 //        return operationDao.getOperationsByCategory(categoryId);
 //    }
 
+    public LiveData<List<Operation>> getOperationsByBudget(int budgetId) {
+        return operationDao.getOperationsByBudget(budgetId);
+    }
+
     public LiveData<List<Operation>> getOperationsByCategory(int categoryId) {
         // Сначала проверяем, есть ли данные в списке-кэше
         MutableLiveData<List<Operation>> liveData = operationsByCategoryCache.get(categoryId);
@@ -304,59 +309,30 @@ public class AppRepository {
     }
 
 
+//    public LiveData<List<OperationWithDate>> getGroupedOperationsByDay(int budgetId) {
+//        MutableLiveData<List<OperationWithDate>> result = new MutableLiveData<>();
+//
+//        operationDao.getAllOperations().observeForever(operations -> {
+//            Map<String, List<Operation>> grouped = new LinkedHashMap<>();
+//
+//            if (operations != null) {
+//                for (Operation op : operations) {
+//                    grouped.putIfAbsent(op.getDate(), new ArrayList<>());
+//                    grouped.get(op.getDate()).add(op);
+//                }
+//
+//                List<OperationWithDate> list = new ArrayList<>();
+//                for (Map.Entry<String, List<Operation>> entry : grouped.entrySet()) {
+//                    list.add(new OperationWithDate(entry.getKey(), entry.getValue()));
+//                }
+//
+//                result.postValue(list);
+//            }
+//        });
+//
+//        return result;
+//    }
 
-
-    // === Тестовые данные ===
-    public void populateWithTestData() {
-        new Thread(() -> {
-            try {
-                // Очистка БД
-                database.clearAllTables();
-                database.getOpenHelper().getWritableDatabase()
-                        .execSQL("DELETE FROM sqlite_sequence");
-
-                // Добавляем пользователя
-                User user = new User("Valery");
-                long userId = userDao.insert(user);
-
-                // Добавляем бюджет за январь
-                Budget janBudget = new Budget((int) userId, "06/25");
-                int budgetId = (int) budgetDao.insert(janBudget);
-                janBudget.setBudgetId(budgetId);
-
-                // Создаём провайдер
-                CategoryProvider.DefaultCategoryProvider provider = new CategoryProvider.DefaultCategoryProvider();
-
-                // Получаем дефолтные категории
-                List<Category> expenseCategories = provider.getExpenseCategories(budgetId);
-                List<Category> incomeCategories = provider.getIncomeCategories(budgetId);
-
-                // Объединяем в один список для удобства
-                List<Category> allCategories = new ArrayList<>();
-                allCategories.addAll(expenseCategories);
-                allCategories.addAll(incomeCategories);
-
-                // Вставляем категории в БД
-                for (Category category : allCategories) {
-                    long categoryId = categoryDao.insert(category);
-                    category.setCategoryId((int) categoryId);
-                }
-
-                // === ОПЕРАЦИИ (по одной на категорию для теста) ===
-                for (Category category : allCategories) {
-                    if (category.getType() == CategoryType.EXPENSE) {
-                        operationDao.insert(new Operation(5000, category.getCategoryId(), "2025-06-00"));
-                    } else if (category.getType() == CategoryType.INCOME) {
-                        operationDao.insert(new Operation(50000, category.getCategoryId(), "2025-06-00"));
-                    }
-                }
-
-
-            } catch (Exception e) {
-                Log.e("TEST_DB", "Ошибка при заполнении тестовыми данными", e);
-            }
-        }).start();
-    }
 
     public LiveData<Long> createDefaultBudget(String month) {
         new Thread(() -> {
@@ -374,48 +350,30 @@ public class AppRepository {
                 long budgetId = budgetDao.insert(newBudget);
                 newBudget.setBudgetId((int)budgetId);
 
-                // Создаём провайдер
+                // Получаем категории
                 CategoryProvider.DefaultCategoryProvider provider = new CategoryProvider.DefaultCategoryProvider();
-
-                // Получаем дефолтные категории
-                List<Category> expenseCategories = provider.getExpenseCategories((int)budgetId);
-                List<Category> incomeCategories = provider.getIncomeCategories((int)budgetId);
-
-                // Объединяем в один список для удобства
                 List<Category> allCategories = new ArrayList<>();
+                List<Category> expenseCategories = provider.getExpenseCategories((int) budgetId);
+                List<Category> incomeCategories = provider.getIncomeCategories((int) budgetId);
+
                 allCategories.addAll(expenseCategories);
                 allCategories.addAll(incomeCategories);
 
-                // Вставляем категории в БД
+                // Вставляем все категории
                 for (Category category : allCategories) {
                     long categoryId = categoryDao.insert(category);
                     category.setCategoryId((int) categoryId);
                 }
 
-                // === Добавляем операции по дням ===
-                Random random = new Random();
-                String[] dates = {"2025-06-01", "2025-06-02", "2025-06-03", "2025-06-04"};
-                for (String date : dates) {
-                    int operationCount = random.nextInt(3) + 2; // 2-4 операции на день
-
-                    for (int i = 0; i < operationCount; i++) {
-                        // Выбираем случайную категорию
-                        Category randomCategory = allCategories.get(random.nextInt(allCategories.size()));
-                        int categoryId = randomCategory.getCategoryId();
-                        int amount;
-
-                        if (randomCategory.getType() == CategoryType.EXPENSE) {
-                            amount = random.nextInt(5000) + 500; // расход: 500–5500
-                        } else {
-                            amount = random.nextInt(10000) + 5000; // доход: 5000–15000
-                        }
-
-                        Operation operation = new Operation(amount, categoryId, date);
-                        operationDao.insert(operation);
-                    }
-                }
+                // === Добавляем операции вручную для каждого дня ===
+                addOperationsForDay("2025-06-01", (int) budgetId, categoryDao, operationDao);
+                addOperationsForDay("2025-06-02", (int) budgetId, categoryDao, operationDao);
+                addOperationsForDay("2025-06-03", (int) budgetId, categoryDao, operationDao);
+                addOperationsForDay("2025-06-04", (int) budgetId, categoryDao, operationDao);
 
                 newBudgetId.postValue(budgetId);
+
+
 
             } catch (Exception e) {
                 Log.e("TEST_DB", "Ошибка при создании бюджета", e);
@@ -423,6 +381,57 @@ public class AppRepository {
         }).start();
 
         return newBudgetId;
+    }
+
+    private void addOperationsForDay(String date, int budgetId,
+                                     CategoryDao categoryDao,
+                                     OperationDao operationDao) {
+
+        // Получаем все категории для этого бюджета
+        List<Category> categories = categoryDao.getCategoriesByBudget(budgetId);
+
+        if (categories == null || categories.isEmpty()) return;
+
+        // Выбираем конкретные категории
+        Category rent = getCategoryByName(categories, "Аренда");
+        Category food = getCategoryByName(categories, "Питание");
+        Category transport = getCategoryByName(categories, "Транспорт");
+        Category salary = getCategoryByName(categories, "Зарплата");
+        Category freelance = getCategoryByName(categories, "Фриланс");
+
+        if ("2025-06-01".equals(date)) {
+            operationDao.insert(new Operation(6000, rent.getCategoryId(), rent.getName(), date, "Арендодатель", FlowType.EXPENSE));
+            operationDao.insert(new Operation(800, food.getCategoryId(), food.getName(), date, "Пятерочка", FlowType.EXPENSE));
+            operationDao.insert(new Operation(150, transport.getCategoryId(), transport.getName(), date, "Лукойл", FlowType.EXPENSE));
+            operationDao.insert(new Operation(7000, salary.getCategoryId(), salary.getName(), date, "Завод", FlowType.INCOME));
+        }
+
+        else if ("2025-06-02".equals(date)) {
+            operationDao.insert(new Operation(900, food.getCategoryId(), food.getName(), date, "Ресторан \"Хз вообще\"", FlowType.EXPENSE));
+            operationDao.insert(new Operation(200, transport.getCategoryId(), transport.getName(), date, "МосТранспорт", FlowType.EXPENSE));
+            operationDao.insert(new Operation(5000, freelance.getCategoryId(), freelance.getName(), date, "FL.RU", FlowType.INCOME));
+        }
+
+        else if ("2025-06-03".equals(date)) {
+            operationDao.insert(new Operation(1000, food.getCategoryId(), food.getName(), date, "Вкусно и точка", FlowType.EXPENSE));
+            operationDao.insert(new Operation(300, transport.getCategoryId(), transport.getName(), date, "МосГосПарковка", FlowType.EXPENSE));
+            operationDao.insert(new Operation(2000, salary.getCategoryId(), salary.getName(), date, "Завод", FlowType.INCOME));
+        }
+
+        else if ("2025-06-04".equals(date)) {
+            operationDao.insert(new Operation(1200, food.getCategoryId(), food.getName(), date, "ВкусВилл", FlowType.EXPENSE));
+            operationDao.insert(new Operation(100, transport.getCategoryId(), transport.getName(), date, "МосТранспорт", FlowType.EXPENSE));
+            operationDao.insert(new Operation(4000, freelance.getCategoryId(), freelance.getName(), date, "Фриланс", FlowType.INCOME));
+        }
+    }
+
+    private Category getCategoryByName(List<Category> categories, String name) {
+        for (Category c : categories) {
+            if (c.getName().equals(name)) {
+                return c;
+            }
+        }
+        return null;
     }
 
     public void printDatabaseContent() {
@@ -455,7 +464,7 @@ public class AppRepository {
                     }
 
                     for (Category category : categories) {
-                        String typeLabel = (category.getType() == CategoryType.INCOME) ? "Доходная" : "Расходная";
+                        String typeLabel = (category.getType() == FlowType.INCOME) ? "Доходная" : "Расходная";
 
                         Log.d("DB_DUMP", "   ➝ " + typeLabel + " категория: ID=" + category.getCategoryId()
                                 + ", Название='" + category.getName()
@@ -464,7 +473,7 @@ public class AppRepository {
                         List<Operation> operations = operationDao.getOperationsByCategoryNonLineData(category.getCategoryId());
                         for (Operation op : operations) {
                             Log.d("DB_DUMP", "     ➠ Операция: ID=" + op.getOperationId()
-                                    + ", Сумма=" + op.getSum());
+                                    + ", Сумма=" + op.getSum() +  ", Дата =" + op.getDate());
                         }
                     }
                 }

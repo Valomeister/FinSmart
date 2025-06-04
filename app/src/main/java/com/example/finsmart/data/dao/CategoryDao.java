@@ -6,7 +6,7 @@ import androidx.room.Insert;
 import androidx.room.Query;
 
 import com.example.finsmart.data.model.Category;
-import com.example.finsmart.data.model.common.CategoryType;
+import com.example.finsmart.data.model.common.FlowType;
 
 import java.util.List;
 
@@ -21,7 +21,7 @@ public interface CategoryDao {
     List<Category> getCategoriesByBudget(int budgetId);
 
     @Query("SELECT * FROM category_table WHERE budget_id = :budgetId AND category_type = :type")
-    LiveData<List<Category>> getCategoriesByBudgetAndType(int budgetId, CategoryType type);
+    LiveData<List<Category>> getCategoriesByBudgetAndType(int budgetId, FlowType type);
 
     @Query("DELETE FROM category_table")
     void clearAllTables();

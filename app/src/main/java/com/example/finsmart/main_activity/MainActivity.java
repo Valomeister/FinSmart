@@ -18,8 +18,8 @@ import androidx.fragment.app.FragmentManager;
 
 import com.example.finsmart.R;
 import com.example.finsmart.main_activity.budget_page.BudgetPageFragment;
-import com.example.finsmart.main_activity.home_page.HomePageFragment;
 import com.example.finsmart.main_activity.operations_page.OperationsPageFragment;
+import com.example.finsmart.main_activity.home_page.HomePageFragment;
 import com.example.finsmart.main_activity.profile_page.ProfilePageFragment;
 
 public class MainActivity extends AppCompatActivity {

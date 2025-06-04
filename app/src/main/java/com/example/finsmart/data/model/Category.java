@@ -5,7 +5,7 @@ import androidx.room.Entity;
 import androidx.room.ForeignKey;
 import androidx.room.PrimaryKey;
 
-import com.example.finsmart.data.model.common.CategoryType;
+import com.example.finsmart.data.model.common.FlowType;
 
 @Entity(tableName = "category_table",
         foreignKeys = @ForeignKey(entity = Budget.class,
@@ -23,14 +23,14 @@ public class Category {
     private String name;
 
     @ColumnInfo(name = "category_type")
-    private CategoryType type;
+    private FlowType type;
 
     @ColumnInfo(name = "planned_limit")
     private int plannedLimit;
 
     private String emoji;
 
-    public Category(int budgetId, String name, CategoryType type, int plannedLimit, String emoji) {
+    public Category(int budgetId, String name, FlowType type, int plannedLimit, String emoji) {
         this.budgetId = budgetId;
         this.name = name;
         this.type = type;
@@ -64,11 +64,11 @@ public class Category {
         this.name = name;
     }
 
-    public CategoryType getType() {
+    public FlowType getType() {
         return type;
     }
 
-    public void setType(CategoryType type) {
+    public void setType(FlowType type) {
         this.type = type;
     }
 

@@ -4,32 +4,23 @@ import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
-import androidx.lifecycle.LiveData;
 import androidx.lifecycle.ViewModelProvider;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
 
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.example.finsmart.R;
 import com.example.finsmart.data.database.AppDatabase;
 import com.example.finsmart.data.model.Budget;
 import com.example.finsmart.data.model.Category;
-import com.example.finsmart.data.model.common.CategoryType;
+import com.example.finsmart.data.model.common.FlowType;
 import com.example.finsmart.data.repository.AppRepository;
-import com.example.finsmart.main_activity.CurrencyUtils;
-import com.example.finsmart.main_activity.budget_page.BudgetPageFragment;
-import com.example.finsmart.main_activity.budget_page.BudgetUtils;
 import com.example.finsmart.main_activity.budget_page.SharedBudgetViewModel;
-import com.github.mikephil.charting.charts.PieChart;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class BudgetConfirmFragment extends Fragment {
@@ -138,7 +129,7 @@ public class BudgetConfirmFragment extends Fragment {
     int getIncomeSum(List<Category> categories) {
         int sum = 0;
         for (Category category : categories) {
-            if (category.getType() == CategoryType.INCOME) {
+            if (category.getType() == FlowType.INCOME) {
                 sum += category.getPlannedLimit();
             }
         }
@@ -148,7 +139,7 @@ public class BudgetConfirmFragment extends Fragment {
     int getExpenseSum(List<Category> categories) {
         int sum = 0;
         for (Category category : categories) {
-            if (category.getType() == CategoryType.EXPENSE) {
+            if (category.getType() == FlowType.EXPENSE) {
                 sum += category.getPlannedLimit();
             }
         }

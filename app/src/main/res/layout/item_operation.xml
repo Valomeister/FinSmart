@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    android:gravity="center_vertical"
+    android:paddingVertical="12dp"
+    android:background="#FFFFFF"
+    android:paddingHorizontal="28dp">
+
+    <ImageView
+        android:id="@+id/addOperationButton"
+        android:layout_width="32dp"
+        android:layout_height="32dp"
+        android:src="@drawable/payment_default_icon"
+        android:layout_marginEnd="14dp"/>
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:gravity="">
+    <TextView
+        android:id="@+id/operationName"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Завод"
+        android:textSize="14sp"
+        android:layout_gravity="center_vertical"
+        android:layout_marginBottom="2dp"/>
+    <TextView
+        android:id="@+id/categoryName"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Зарплата"
+        android:textSize="12sp"
+        android:layout_gravity="center_vertical"/>
+    </LinearLayout>
+
+    <!-- Пустое пространство -->
+    <View
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_weight="1" />
+
+    <!-- Сумма -->
+    <TextView
+        android:id="@+id/operationAmount"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="+22 000 ₽"
+        android:textSize="16sp"
+        android:gravity="center"
+        android:layout_gravity="center_vertical"
+        android:background="@color/white"
+        app:fontFamily="@font/roboto_medium"/>
+
+</LinearLayout>
+
+
+
+

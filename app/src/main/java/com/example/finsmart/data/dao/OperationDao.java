@@ -14,12 +14,18 @@ public interface OperationDao {
     @Insert
     long insert(Operation operation);
 
-    // Получить все операции по ID категории
+    @Query("SELECT * FROM operation_table WHERE category_id IN " +
+            "(SELECT category_id FROM category_table WHERE budget_id = :budgetId)")
+    LiveData<List<Operation>> getOperationsByBudget(int budgetId);
+
     @Query("SELECT * FROM operation_table WHERE category_id = :categoryId")
     LiveData<List<Operation>> getOperationsByCategory(int categoryId);
 
     @Query("SELECT * FROM operation_table WHERE category_id = :categoryId")
     List<Operation> getOperationsByCategoryNonLineData(int categoryId);
+
+    @Query("SELECT * FROM operation_table ORDER BY date DESC")
+    LiveData<List<Operation>> getAllOperations();
 
     @Query("DELETE FROM operation_table")
     void clearAllTables();

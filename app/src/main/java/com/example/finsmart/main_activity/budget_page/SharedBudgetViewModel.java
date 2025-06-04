@@ -12,7 +12,7 @@ import androidx.lifecycle.MutableLiveData;
 import com.example.finsmart.data.model.Budget;
 import com.example.finsmart.data.model.Category;
 import com.example.finsmart.data.model.Operation;
-import com.example.finsmart.data.model.common.CategoryType;
+import com.example.finsmart.data.model.common.FlowType;
 import com.example.finsmart.data.repository.AppRepository;
 import com.example.finsmart.main_activity.budget_page.budget_details_page.CategoryWithTotal;
 
@@ -45,12 +45,20 @@ public class SharedBudgetViewModel extends AndroidViewModel {
     }
 
     public LiveData<List<CategoryWithTotal>> getExpenseCategoriesWithTotal(int budgetId) {
-        return repository.getCategoriesWithTotalByType(budgetId, CategoryType.EXPENSE);
+        return repository.getCategoriesWithTotalByType(budgetId, FlowType.EXPENSE);
     }
 
     public LiveData<List<CategoryWithTotal>> getIncomeCategoriesWithTotal(int budgetId) {
-        return repository.getCategoriesWithTotalByType(budgetId, CategoryType.INCOME);
+        return repository.getCategoriesWithTotalByType(budgetId, FlowType.INCOME);
 
+    }
+
+//    public LiveData<List<OperationWithDate>> getGroupedOperationsByDay(int budgetId) {
+//        return repository.getGroupedOperationsByDay(budgetId);
+//    }
+
+    public LiveData<List<Operation>> getOperationsByBudget(int budgetId) {
+        return repository.getOperationsByBudget(budgetId);
     }
 
     public void printDatabaseContent() {

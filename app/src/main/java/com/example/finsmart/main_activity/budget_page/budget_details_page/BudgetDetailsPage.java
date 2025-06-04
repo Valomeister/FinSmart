@@ -45,7 +45,7 @@ public class BudgetDetailsPage extends Fragment {
 
         viewModel = new ViewModelProvider(this, factory).get(SharedBudgetViewModel.class);
 
-        viewModel.printDatabaseContent();
+//        viewModel.printDatabaseContent();
 
         initUI();
 

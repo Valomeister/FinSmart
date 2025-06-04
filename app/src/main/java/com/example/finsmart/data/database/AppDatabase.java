@@ -3,10 +3,8 @@ package com.example.finsmart.data.database;
 import androidx.room.Database;
 import androidx.room.Room;
 import androidx.room.RoomDatabase;
-import androidx.room.TypeConverters;
 
 import android.content.Context;
-import android.util.Log;
 
 import com.example.finsmart.data.dao.BudgetDao;
 import com.example.finsmart.data.dao.CategoryDao;
@@ -16,11 +14,8 @@ import com.example.finsmart.data.model.Budget;
 import com.example.finsmart.data.model.Category;
 import com.example.finsmart.data.model.Operation;
 import com.example.finsmart.data.model.User;
-import com.example.finsmart.data.model.common.CategoryType;
 
-import java.util.List;
-
-@Database(entities = {User.class, Budget.class, Category.class, Operation.class}, version = 4)
+@Database(entities = {User.class, Budget.class, Category.class, Operation.class}, version = 7)
 public abstract class AppDatabase extends RoomDatabase {
     public abstract UserDao userDao();
     public abstract BudgetDao budgetDao();
