@@ -2,6 +2,7 @@ package com.example.finsmart.main_activity;
 
 import android.graphics.Color;
 import android.os.Bundle;
+import android.view.View;
 import android.widget.LinearLayout;
 
 import androidx.activity.EdgeToEdge;
@@ -44,6 +45,7 @@ public class MainActivity extends AppCompatActivity {
     private ImageView homeIcon, budgetIcon, operationsIcon, profileIcon;
     private TextView homeIconText, budgetIconText, operationsIconText, profileIconText;
     private LinearLayout homeLayout, budgetLayout, operationsLayout, profileLayout;
+    private View gradientDelimeter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -72,6 +74,9 @@ public class MainActivity extends AppCompatActivity {
     private void initUI() {
         // toolbar
         toolbarLinearLayout = findViewById(R.id.toolbar);
+
+        // Черта под toolbar
+        gradientDelimeter = findViewById(R.id.gradientDelimeter);
 
         // Иконки
         homeIcon = findViewById(R.id.home_icon);
@@ -148,6 +153,15 @@ public class MainActivity extends AppCompatActivity {
 
         // Выделяем активную иконку
         setActiveIcon(position);
+
+        // настройка toolbar
+        if (position == 3) {
+            toolbarLinearLayout.setVisibility(LinearLayout.GONE);
+            gradientDelimeter.setVisibility(View.GONE);
+        } else {
+            toolbarLinearLayout.setVisibility(LinearLayout.VISIBLE);
+            gradientDelimeter.setVisibility(View.VISIBLE);
+        }
     }
 
     /**

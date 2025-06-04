@@ -27,6 +27,7 @@
     </LinearLayout>
 
     <View
+        android:id="@+id/gradientDelimeter"
         android:layout_width="match_parent"
         android:layout_height="5dp"
         android:background="@drawable/gradient_delimeter"/>
