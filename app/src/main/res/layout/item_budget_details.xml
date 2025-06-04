@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    android:gravity="center_vertical">
+
+    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:paddingVertical="12dp"
+        android:paddingHorizontal="4dp">
+
+        <!-- Текст -->
+        <TextView
+            android:id="@+id/titleTextView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Аренда"
+            android:textSize="14sp"
+            android:textColor="#333"
+            android:layout_gravity="center_vertical"/>
+
+        <!-- Пустое пространство -->
+        <View
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_weight="1" />
+
+        <!-- Реальная сумма -->
+        <TextView
+            android:id="@+id/amountActual"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="5 000 ₽"
+            android:textColorHint="#757575"
+            android:textSize="14sp"
+            android:textColor="#595959"
+            android:gravity="center"
+            android:layout_gravity="center_vertical"
+            android:background="@color/white"
+            app:fontFamily="@font/roboto_bold"/>
+
+        <!-- "из" -->
+        <TextView
+            android:id="@+id/outOfTextView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text=" из "
+            android:textColorHint="#757575"
+            android:textSize="14sp"
+            android:textColor="#595959"
+            android:gravity="center"
+            android:layout_gravity="center_vertical"
+            android:background="@color/white"/>
+
+        <!-- Планируемая сумма -->
+        <TextView
+            android:id="@+id/amountPlanned"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="5 000 ₽"
+            android:textColorHint="#757575"
+            android:textSize="14sp"
+            android:textColor="#595959"
+            android:gravity="center"
+            android:layout_gravity="center_vertical"
+            android:background="@color/white"
+            app:fontFamily="@font/roboto_bold"/>
+
+    </LinearLayout>
+
+    <!-- divider -->
+    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:paddingHorizontal="0dp"
+        android:weightSum="1">
+        <View
+            android:id="@+id/progressBar"
+            android:layout_width="0dp"
+            android:layout_height="3dp"
+            android:layout_weight="0.67"
+            android:background="#D9D9D9" />
+    </LinearLayout>
+
+</LinearLayout>
+

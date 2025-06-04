@@ -11,7 +11,6 @@ import java.io.OutputStream;
 public class FileUtils {
 
     public static void copyPortfolioDataIfNeeded(Context context) {
-        Log.d("tmp", "copyPortfolioDataIfNeeded");
         String fileName = "portfolio_data.csv";
         File file = new File(context.getFilesDir(), fileName);
 

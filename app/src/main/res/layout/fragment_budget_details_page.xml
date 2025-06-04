@@ -24,7 +24,8 @@
             android:textColor="#4D4D4D"
             android:layout_gravity="center_vertical"
             app:fontFamily="@font/roboto_medium"
-            android:gravity="center"/>
+            android:gravity="center"
+            android:layout_marginBottom="48dp"/>
 
         <!-- RecyclerView -->
         <androidx.recyclerview.widget.RecyclerView
@@ -33,6 +34,7 @@
             android:layout_height="wrap_content"
             android:nestedScrollingEnabled="false"
             android:paddingTop="8dp"
+            android:paddingHorizontal="32dp"
             android:layout_weight="1"/>
 
 
@@ -55,7 +57,8 @@
                 android:textSize="16sp"
                 android:padding="8dp"
                 android:gravity="center"
-                android:layout_weight="1"/>
+                android:layout_weight="1"
+                android:layout_marginEnd="10dp"/>
 
 
 

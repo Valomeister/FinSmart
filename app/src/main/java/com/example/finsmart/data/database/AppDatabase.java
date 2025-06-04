@@ -20,7 +20,7 @@ import com.example.finsmart.data.model.common.CategoryType;
 
 import java.util.List;
 
-@Database(entities = {User.class, Budget.class, Category.class, Operation.class}, version = 3)
+@Database(entities = {User.class, Budget.class, Category.class, Operation.class}, version = 4)
 public abstract class AppDatabase extends RoomDatabase {
     public abstract UserDao userDao();
     public abstract BudgetDao budgetDao();
@@ -36,7 +36,7 @@ public abstract class AppDatabase extends RoomDatabase {
                 if (INSTANCE == null) {
                     INSTANCE = Room.databaseBuilder(context.getApplicationContext(),
                                     AppDatabase.class, "finsmart_database")
-                            .fallbackToDestructiveMigration()
+//                            .fallbackToDestructiveMigration()
                             .build();
                 }
             }

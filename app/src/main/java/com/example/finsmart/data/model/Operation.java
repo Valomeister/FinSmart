@@ -22,7 +22,11 @@ public class Operation {
     @ColumnInfo(name = "category_id", index = true)
     private Integer categoryId;
 
-    public Operation(double sum, Integer categoryId) {
+    @ColumnInfo(name = "date")
+    private String date;
+
+
+    public Operation(double sum, Integer categoryId, String date) {
         this.sum = sum;
         this.categoryId = categoryId;
     }
@@ -50,5 +54,11 @@ public class Operation {
 
     public void setCategoryId(Integer categoryId) {
         this.categoryId = categoryId;
+    }
+    public String getDate() {
+        return date;
+    }
+    public void setDate(String date) {
+        this.date = date;
     }
 }

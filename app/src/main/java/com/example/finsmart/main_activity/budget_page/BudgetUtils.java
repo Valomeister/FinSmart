@@ -15,7 +15,7 @@ public final class BudgetUtils {
      */
     public static String getCurrentMonth() {
         LocalDate currentDate = LocalDate.now();
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MM/yyyy");
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM");
         return currentDate.format(formatter);
     }
 }

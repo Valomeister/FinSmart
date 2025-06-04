@@ -1,5 +1,6 @@
 package com.example.finsmart.data.dao;
 
+import androidx.lifecycle.LiveData;
 import androidx.room.Dao;
 import androidx.room.Insert;
 import androidx.room.Query;
@@ -15,7 +16,10 @@ public interface OperationDao {
 
     // Получить все операции по ID категории
     @Query("SELECT * FROM operation_table WHERE category_id = :categoryId")
-    List<Operation> getOperationsByCategory(int categoryId);
+    LiveData<List<Operation>> getOperationsByCategory(int categoryId);
+
+    @Query("SELECT * FROM operation_table WHERE category_id = :categoryId")
+    List<Operation> getOperationsByCategoryNonLineData(int categoryId);
 
     @Query("DELETE FROM operation_table")
     void clearAllTables();
