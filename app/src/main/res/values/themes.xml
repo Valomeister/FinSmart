@@ -24,7 +24,16 @@
         <!-- Цвет заднего фона -->
         <item name="android:windowBackground">#FFFFFF</item>
 
+        <item name="radioButtonStyle">@style/CustomRadioButton</item>
+
     </style>
 
     <style name="Theme.FinSmart" parent="Base.Theme.FinSmart" />
+
+    <!-- Базовый стиль для RadioButton -->
+    <style name="CustomRadioButton" parent="Widget.AppCompat.CompoundButton.RadioButton">
+        <item name="android:button">@drawable/custom_radio_button</item> <!-- Кастомный drawable -->
+        <item name="android:buttonTint">@null</item> <!-- Отключаем Material tint -->
+        <item name="android:textColor">@color/black</item> <!-- Цвет текста -->
+    </style>
 </resources>

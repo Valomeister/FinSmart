@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Внешнее голубое кольцо (3-й слой) -->
+    <item>
+        <shape android:shape="oval">
+            <size android:width="20dp" android:height="20dp"/>
+            <stroke
+                android:width="2dp"
+                android:color="#7D7AFF"/> <!-- Голубой -->
+        </shape>
+    </item>
+
+    <!-- Белое кольцо (2-й слой) -->
+    <item android:top="2dp" android:bottom="2dp" android:left="2dp" android:right="2dp">
+        <shape android:shape="oval">
+            <size android:width="16dp" android:height="16dp"/>
+            <stroke
+                android:width="2dp"
+                android:color="#FFFFFF"/> <!-- Белый -->
+        </shape>
+    </item>
+
+    <!-- Голубой центр (1-й слой) -->
+    <item android:top="4dp" android:bottom="4dp" android:left="4dp" android:right="4dp">
+        <shape android:shape="oval">
+            <size android:width="12dp" android:height="12dp"/>
+            <solid android:color="#7D7AFF"/> <!-- Голубой -->
+        </shape>
+    </item>
+</layer-list>

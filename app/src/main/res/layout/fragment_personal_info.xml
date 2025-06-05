@@ -1,14 +1,185 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".main_activity.profile_page.PersonalInfoFragment">
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    tools:context=".main_activity.profile_page.PersonalInfoFragment"
+    android:orientation="vertical"
+    android:background="#F5F5F5">
 
-    <!-- TODO: Update blank fragment layout -->
-    <TextView
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:text="@string/hello_blank_fragment" />
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:background="#FFFFFF"
+        android:paddingHorizontal="32dp"
+        android:paddingVertical="22dp">
 
-</FrameLayout>
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Ваше имя"
+            android:textSize="14sp"
+            app:fontFamily="@font/roboto_bold"
+            android:layout_marginBottom="16dp"/>
+
+        <EditText
+            android:id="@+id/firstNameEditText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Валерий"
+            android:textColorHint="#B3B3B3"
+            android:background="#FFFFFF"
+            android:textSize="14sp"
+            android:layout_marginBottom="16dp"/>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="#D9D9D9"
+            android:layout_marginBottom="16dp"/>
+
+        <EditText
+            android:id="@+id/LastNameEditText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColorHint="#B3B3B3"
+            android:text="Королихин"
+            android:background="#FFFFFF"
+            android:textSize="14sp"/>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:background="#FFFFFF"
+        android:paddingHorizontal="32dp"
+        android:paddingVertical="22dp"
+        android:layout_marginTop="11dp">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Контактные данные"
+            android:textSize="14sp"
+            app:fontFamily="@font/roboto_bold"
+            android:layout_marginBottom="16dp"/>
+
+        <EditText
+            android:id="@+id/phoneEditText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="+7 (901) 501 90-73"
+            android:textColorHint="#B3B3B3"
+            android:background="#FFFFFF"
+            android:textSize="14sp"
+            android:layout_marginBottom="16dp"/>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="#D9D9D9"
+            android:layout_marginBottom="16dp"/>
+
+        <EditText
+            android:id="@+id/emailEditText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:hint="Введите почту"
+            android:textColorHint="#B3B3B3"
+            android:background="#FFFFFF"
+            android:textSize="14sp"/>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:background="#FFFFFF"
+        android:paddingHorizontal="32dp"
+        android:paddingVertical="22dp"
+        android:layout_marginTop="11dp">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Дата рождения"
+            android:textSize="14sp"
+            app:fontFamily="@font/roboto_bold"
+            android:layout_marginBottom="16dp"/>
+
+        <EditText
+            android:id="@+id/birthdayEditText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="25.02.2007"
+            android:textColorHint="#B3B3B3"
+            android:background="#FFFFFF"
+            android:textSize="14sp"/>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:background="#FFFFFF"
+        android:paddingHorizontal="32dp"
+        android:paddingVertical="22dp"
+        android:layout_marginTop="11dp">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Пол"
+            android:textSize="14sp"
+            app:fontFamily="@font/roboto_bold"
+            android:layout_marginBottom="16dp"/>
+
+        <RadioGroup
+            android:id="@+id/radioGroup"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"> <!-- или horizontal -->
+
+            <RadioButton
+                android:id="@+id/radioOption1"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                style="@style/CustomRadioButton"
+                android:paddingStart="8dp"
+                android:textSize="14sp"
+                android:textColor="#4D4D4D"
+                android:text="Мужской" />
+
+            <RadioButton
+                android:id="@+id/radioOption2"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                style="@style/CustomRadioButton"
+                android:paddingStart="8dp"
+                android:textSize="14sp"
+                android:textColor="#4D4D4D"
+                android:text="Женский"
+                android:layout_marginTop="6dp"/>
+
+            <RadioButton
+                android:id="@+id/radioOption3"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                style="@style/CustomRadioButton"
+                android:paddingStart="8dp"
+                android:textSize="14sp"
+                android:textColor="#4D4D4D"
+                android:text="Ударный вертолет AH-64 Apache"
+                android:layout_marginTop="6dp" />
+        </RadioGroup>
+
+    </LinearLayout>
+
+
+</LinearLayout>

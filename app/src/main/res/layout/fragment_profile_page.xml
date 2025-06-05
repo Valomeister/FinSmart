@@ -46,6 +46,7 @@
     </LinearLayout>
 
     <LinearLayout
+        android:id="@+id/personalInfoLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
@@ -70,6 +71,7 @@
     </LinearLayout>
 
     <LinearLayout
+        android:id="@+id/dataManagementLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
@@ -95,6 +97,7 @@
     </LinearLayout>
 
     <LinearLayout
+        android:id="@+id/settingsLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
@@ -120,6 +123,7 @@
     </LinearLayout>
 
     <LinearLayout
+        android:id="@+id/supportLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
@@ -145,6 +149,7 @@
     </LinearLayout>
 
     <LinearLayout
+        android:id="@+id/logoutLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
