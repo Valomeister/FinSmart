@@ -247,10 +247,10 @@ public class CryptoDBHelper extends SQLiteOpenHelper {
     private List<Crypto> getSampleCryptos() {
         ArrayList<Crypto> cryptos = new ArrayList<>();
 
-        cryptos.add(new Crypto("Bitcoin", "BTC", 0.01123112, 2_500_000, 2_700_000, "15.11.2024"));
-        cryptos.add(new Crypto("Ethereum", "ETH", 0.25548942, 160_000, 180_000, "10.01.2025"));
-        cryptos.add(new Crypto("Solana", "SOL", 3.15125436, 8_000, 9_000, "05.02.2025"));
-        cryptos.add(new Crypto("Toncoin", "TON", 950.35239124, 150, 110, "19.12.2024"));
+        cryptos.add(new Crypto("Bitcoin", "BTC", 0.04123112, 2_500_000, 2_700_000, "15.11.2024"));
+//        cryptos.add(new Crypto("Ethereum", "ETH", 0.25548942, 160_000, 180_000, "10.01.2025"));
+//        cryptos.add(new Crypto("Solana", "SOL", 3.15125436, 8_000, 9_000, "05.02.2025"));
+//        cryptos.add(new Crypto("Toncoin", "TON", 950.35239124, 150, 110, "19.12.2024"));
 
         return cryptos;
     }

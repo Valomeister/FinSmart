@@ -28,7 +28,7 @@ public class Fund {
     }
 
     public double getDynamics() {
-        return amount / investedSum;
+        return (amount / investedSum - 1) * 100;
     }
 
     public String getStartDate() {

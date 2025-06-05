@@ -6,8 +6,10 @@ import android.graphics.Typeface;
 import android.graphics.drawable.GradientDrawable;
 import android.os.Bundle;
 
+import androidx.annotation.Nullable;
 import androidx.core.content.res.ResourcesCompat;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.ViewModelProvider;
 
 import android.util.Log;
 import android.os.Handler;
@@ -22,11 +24,17 @@ import android.widget.TextView;
 import com.example.finsmart.data.database.AppDatabase;
 import com.example.finsmart.data.repository.AppRepository;
 import com.example.finsmart.main_activity.FileUtils;
+import com.example.finsmart.main_activity.home_page.crypto_page.Crypto;
+import com.example.finsmart.main_activity.home_page.crypto_page.CryptoDBHelper;
 import com.example.finsmart.main_activity.home_page.crypto_page.CryptosFragment;
 import com.example.finsmart.main_activity.home_page.currency_page.CurrenciesFragment;
+import com.example.finsmart.main_activity.home_page.currency_page.Currency;
+import com.example.finsmart.main_activity.home_page.currency_page.CurrencyDBHelper;
 import com.example.finsmart.main_activity.home_page.deposit_page.DepositsFragment;
 import com.example.finsmart.main_activity.home_page.fund_page.FundsFragment;
 import com.example.finsmart.R;
+import com.example.finsmart.main_activity.home_page.stock_page.Stock;
+import com.example.finsmart.main_activity.home_page.stock_page.StockDBHelper;
 import com.example.finsmart.main_activity.home_page.stock_page.StocksFragment;
 import com.github.mikephil.charting.charts.LineChart;
 import com.github.mikephil.charting.charts.PieChart;
@@ -46,8 +54,21 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 
 public class HomePageFragment extends Fragment {
     private List<Button> timeRangeButtons = new ArrayList<>();
@@ -57,7 +78,16 @@ public class HomePageFragment extends Fragment {
     private boolean isAnimationRunning = false;
     View view;
 
-    private AppRepository repository;
+    private SharedViewModel viewModel;
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        viewModel = new ViewModelProvider(requireActivity()).get(SharedViewModel.class);
+
+
+    }
+
 
     /**
      * Создает и возвращает иерархию View, связанную с фрагментом.
@@ -120,34 +150,287 @@ public class HomePageFragment extends Fragment {
         onTimeRangeClicked(view.findViewById(R.id.btn1Y));
 
 
-
-        // Получаем доступ к БД
-        AppDatabase db = AppDatabase.getInstance(requireContext());
-
-        // Создаём Repository
-        repository = new AppRepository(
-                db.userDao(),
-                db.budgetDao(),
-                db.categoryDao(),
-                db.operationDao(),
-                db
-        );
-
-        // Запускаем заполнение тестовыми данными
-//        repository.populateWithTestData();
-
+        // Проверяем, есть ли уже загруженные данные
+        if (viewModel.getPortfolioData().getValue() == null) {
+            updatePortfolioChart(); // загружаем данные только один раз
+        } else {
+            LineChart linechart2 = view.findViewById(R.id.LineChart2);
+            setupLineChart(linechart2, viewModel.getPortfolioData().getValue());
+        }
 
         return view;
     }
 
-    /**
-     * Обрабатывает нажатие на кнопку выбора временного диапазона.
-     * Устанавливает выбранную кнопку активной, определяет количество дней,
-     * соответствующее выбранному диапазону, и обновляет график с данными
-     * за этот период.
-     *
-     * @param selectedButton Кнопка, соответствующая выбранному временному диапазону.
-     */
+
+    private void updatePortfolioChart() {
+        // Инициализируем помощников
+        CryptoDBHelper cryptoDBHelper = new CryptoDBHelper(requireContext());
+        CurrencyDBHelper currencyDBHelper = new CurrencyDBHelper(requireContext());
+        StockDBHelper stockDBHelper = new StockDBHelper(requireContext());
+
+        // Получаем все активы из БД
+        List<Crypto> cryptos = cryptoDBHelper.getAllCryptos();
+        List<Currency> currencies = currencyDBHelper.getAllCurrencies();
+        List<Stock> stocks = stockDBHelper.getAllStocks();
+
+        // Используем Set для уникальных дат
+        Set<String> allDates = new HashSet<>();
+
+        // Хранение суммарной стоимости по датам
+        Map<String, Double> portfolioValueMap = new HashMap<>();
+
+        // Запрашиваем данные по акциям
+        fetchStockData(stocks, allDates, portfolioValueMap);
+
+        // Запрашиваем данные по крипте
+        fetchCryptoData(cryptos, allDates, portfolioValueMap);
+
+        // Запрашиваем данные по валютам
+        fetchCurrencyData(currencies, allDates, portfolioValueMap);
+
+
+        // Ждём завершения всех задач (можно использовать CountDownLatch)
+        new Handler(Looper.getMainLooper()).postDelayed(() -> {
+            List<Entry> entries = generatePortfolioEntries(portfolioValueMap);
+            LineChart linechart2 = view.findViewById(R.id.LineChart2);
+            setupLineChart(linechart2, entries); // метод для обновления графика
+
+            printPortfolioValueMap(portfolioValueMap);
+
+            viewModel.setPortfolioData(entries);
+        }, 5000); // подождать, пока все данные загрузятся
+
+    }
+
+
+    private void fetchStockData(List<Stock> stocks, Set<String> allDates,
+                                Map<String, Double> portfolioValueMap) {
+        Log.d("fetching", "fetchStockData started");
+        String[] urls = {
+                "https://iss.moex.com/iss/history/engines/stock/markets/shares/securities/SBER.json?from=2024-06-06&till=2024-08-04",
+                "https://iss.moex.com/iss/history/engines/stock/markets/shares/securities/SBER.json?from=2024-08-05&till=2024-10-04",
+                "https://iss.moex.com/iss/history/engines/stock/markets/shares/securities/SBER.json?from=2024-10-05&till=2024-12-04",
+                "https://iss.moex.com/iss/history/engines/stock/markets/shares/securities/SBER.json?from=2024-12-05&till=2025-02-04",
+                "https://iss.moex.com/iss/history/engines/stock/markets/shares/securities/SBER.json?from=2025-02-05&till=2025-04-04",
+                "https://iss.moex.com/iss/history/engines/stock/markets/shares/securities/SBER.json?from=2025-04-05&till=2025-06-04"
+        };
+
+        List<StockDataPoint> allStockData = Collections.synchronizedList(new ArrayList<>());
+        CountDownLatch latch = new CountDownLatch(urls.length); // ждём все запросы
+
+        for (String url : urls) {
+            new FetchStockDataTask(url, data -> {
+                allStockData.addAll(data);
+                latch.countDown();
+            }).execute();
+        }
+
+        new Handler(Looper.getMainLooper()).postDelayed(() -> {
+            try {
+                if (latch.await(10, TimeUnit.SECONDS)) {
+                    Log.d("fetching", "Все данные по акциям загружены");
+
+                    // 1. Сортируем по дате
+                    allStockData.sort(Comparator.comparing(StockDataPoint::getDate));
+
+                    // 2. Заполняем пропущенные даты
+                    List<StockDataPoint> filledData = fillMissingDatesWithLastPrice(allStockData);
+
+                    // 3. Рассчитываем стоимость портфеля
+                    for (StockDataPoint point : filledData) {
+                        String date = point.getDate();
+                        double price = point.getClosePrice();
+
+                        allDates.add(date);
+
+                        for (Stock stock : stocks) {
+                            double value = stock.getQuantity() * price;
+                            portfolioValueMap.put(date, portfolioValueMap.getOrDefault(date, 0.0) + value);
+                        }
+                    }
+                } else {
+                    Log.w("fetching", "Не все данные по акциям были получены");
+                }
+            } catch (InterruptedException e) {
+                Log.e("fetching", "Ошибка ожидания данных", e);
+            }
+        }, 1000);
+
+    }
+    public List<StockDataPoint> fillMissingDatesWithLastPrice(List<StockDataPoint> originalData) {
+        List<StockDataPoint> filledData = new ArrayList<>();
+
+        // Сортируем по дате (на случай, если данные не упорядочены)
+        originalData.sort(Comparator.comparing(StockDataPoint::getDate));
+
+        // Преобразуем в Map для быстрого поиска
+        Map<String, Double> dataMap = new HashMap<>();
+        for (StockDataPoint point : originalData) {
+            dataMap.put(point.getDate(), point.getClosePrice());
+        }
+
+        // Начальная и конечная дата
+        String startDateStr = originalData.get(0).getDate();
+        String endDateStr = originalData.get(originalData.size()-1).getDate();
+        if (Objects.equals(endDateStr, "2025-06-04")) {
+            endDateStr = "2025-06-05";
+        }
+
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+        Calendar startCal = Calendar.getInstance();
+        Calendar endCal = Calendar.getInstance();
+
+        try {
+            startCal.setTime(sdf.parse(startDateStr));
+            endCal.setTime(sdf.parse(endDateStr));
+        } catch (ParseException e) {
+            Log.e("DateUtils", "Ошибка парсинга даты", e);
+            return filledData;
+        }
+
+        double lastKnownPrice = 0; // Последняя известная цена
+
+        while (!startCal.getTime().after(endCal.getTime())) {
+            String currentDate = sdf.format(startCal.getTime());
+
+            if (dataMap.containsKey(currentDate)) {
+                // Если есть данные за эту дату — добавляем и обновляем lastKnownPrice
+                lastKnownPrice = dataMap.get(currentDate);
+                filledData.add(new StockDataPoint(currentDate, lastKnownPrice));
+            } else {
+                // Если данных нет — используем последнюю известную цену
+                filledData.add(new StockDataPoint(currentDate, lastKnownPrice));
+            }
+
+            startCal.add(Calendar.DAY_OF_MONTH, 1);
+        }
+
+        for (StockDataPoint dp : filledData) {
+            Log.d("filledData", dp.getDate() + "; " + String.valueOf(dp.getClosePrice()));
+        }
+
+        return filledData;
+    }
+
+    private void fetchCryptoData(List<Crypto> cryptos, Set<String> allDates,
+                                 Map<String, Double> portfolioValueMap) {
+        Log.d("fetching", "fetchCryptoData started");
+
+        String cryptoUrl = "https://api.coingecko.com/api/v3/coins/bitcoin/market_chart?vs_currency=rub&days=365";
+
+        new FetchCryptoDataTask(cryptoUrl, data -> {
+            for (CryptoDataPoint point : data) {
+                String date = point.getDate(); // формат: "2024-01-03"
+                double price = point.getPrice();
+
+                allDates.add(date);
+
+                // Рассчитываем стоимость крипты
+                for (Crypto crypto : cryptos) {
+                    double value = crypto.getQuantity() * price;
+                    portfolioValueMap.put(date, portfolioValueMap.getOrDefault(date, 0.0) + value);
+                }
+
+                Log.d("cryptoData", point.getDate() + "; " + String.valueOf(point.getPrice()));
+
+            }
+        }).execute();
+
+        Log.d("fetching", "fetchCryptoData ended");
+
+    }
+
+    private void fetchCurrencyData(List<Currency> currencies, Set<String> allDates,
+                                   Map<String, Double> portfolioValueMap) {
+        Log.d("fetching", "fetchCurrencyData started");
+
+        String currencyUrl = "https://www.cbr.ru/scripts/XML_dynamic.asp?date_req1=06.06.2024&date_req2=05.06.2025&VAL_NM_RQ=R01235";
+
+        new FetchCurrencyDataTask(currencyUrl, data -> {
+            for (CurrencyDataPoint point : data) {
+                String date = formatDate(point.getDate()); // преобразуем "01.01.2024" в "2024-01-01"
+                double rate = point.getRate();
+
+                allDates.add(date);
+
+                // Рассчитываем стоимость валют
+                for (Currency currency : currencies) {
+                    double value = currency.getQuantity() * rate;
+                    portfolioValueMap.put(date, portfolioValueMap.getOrDefault(date, 0.0) + value);
+                }
+
+                Log.d("currencyData", point.getDate() + "; " + String.valueOf(point.getRate()));
+
+            }
+        }).execute();
+
+        Log.d("fetching", "fetchCurrencyData ended: ");
+
+    }
+
+    private String formatDate(String cbrDate) {
+        // "01.01.2024" → "2024-01-01"
+        String[] parts = cbrDate.split("\\.");
+        return parts[2] + "-" + parts[1] + "-" + parts[0];
+    }
+
+    private List<Entry> generatePortfolioEntries(Map<String, Double> portfolioValueMap) {
+        List<Entry> entries = new ArrayList<>();
+
+        // Сортируем даты
+        List<String> sortedDates = new ArrayList<>(portfolioValueMap.keySet());
+        Collections.sort(sortedDates);
+
+        // Генерируем Entry для графика
+        for (int i = 0; i < sortedDates.size(); i++) {
+            String date = sortedDates.get(i);
+            double value = portfolioValueMap.get(date);
+            entries.add(new Entry(i, (float) value, date));
+        }
+
+        return entries;
+    }
+
+    public void printPortfolioValueMap(Map<String, Double> portfolioValueMap) {
+
+        List<Map.Entry<String, Double>> sortedList = getSortedPortfolioList(portfolioValueMap);
+
+        for (Map.Entry<String, Double> entry : sortedList) {
+            String date = entry.getKey();
+            double value = entry.getValue();
+            Log.d("SortedPortfolio", date + " → " + String.format("%.2f ₽", value));
+        }
+    }
+
+    public static List<Map.Entry<String, Double>> getSortedPortfolioList(Map<String, Double> portfolioMap) {
+        List<Map.Entry<String, Double>> list = new ArrayList<>(portfolioMap.entrySet());
+
+        list.sort((entry1, entry2) -> {
+            try {
+                SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+                Date date1 = sdf.parse(entry1.getKey());
+                Date date2 = sdf.parse(entry2.getKey());
+                return date1.compareTo(date2);
+            } catch (Exception e) {
+                Log.e("Sorting", "Ошибка при сортировке дат", e);
+                return 0;
+            }
+        });
+
+        return list;
+    }
+
+
+
+
+
+
+
+
+
+
+
+
     private void onTimeRangeClicked(Button selectedButton) {
         boolean animateChartUpdate = true;
         // Если выбран активный интервал
@@ -181,12 +464,6 @@ public class HomePageFragment extends Fragment {
         updateLineChart(lineChart, lastNEntries, animateChartUpdate);
     }
 
-    /**
-     * Устанавливает переданную кнопку активной среди всех кнопок выбора временного диапазона.
-     * Все остальные кнопки становятся неактивными.
-     *
-     * @param activeButton Кнопка, которую необходимо установить как активную.
-     */
     private void setActiveButton(Button activeButton) {
         for (Button button : timeRangeButtons) {
             boolean isSelected = button == activeButton;
@@ -194,13 +471,6 @@ public class HomePageFragment extends Fragment {
 
         }
     }
-
-    /**
-     * Временный заглушечный метод, возвращающий статически заданный список финансовых данных
-     * для отображения на графике. В текущей реализации данные не извлекаются из реальной базы данных.
-     *
-     * @return Список объектов {@link ChartItem}, содержащих информацию об активах и их стоимости.
-     */
     private List<ChartItem> getChartDataFromDatabase() {
         // временный метод-пустышка - возвращает готовые данные, а не берет их из реальной БД
         List<ChartItem> chartItems = new ArrayList<>();
@@ -214,17 +484,6 @@ public class HomePageFragment extends Fragment {
         return chartItems;
     }
 
-    /**
-     * Настраивает внешний вид круговой диаграммы и заполняет её данными.
-     *
-     * <p>Метод применяет стилизацию: отключает надписи у секторов, легенду и описание,
-     * устанавливает прозрачность и внешний вид центрального текста. После этого
-     * преобразует список {@link ChartItem} в формат, подходящий для {@link PieChart},
-     * и отображает его.</p>
-     *
-     * @param pieChart Круговая диаграмма {@link PieChart}, которую нужно настроить.
-     * @param data Список объектов {@link ChartItem}, содержащих значения, подписи и цвета секторов диаграммы.
-     */
     private void setupPieChart(PieChart pieChart, List<ChartItem> data) {
         // Нагоняем стиля
         pieChart.setDrawEntryLabels(false);      // Надписи у секторов
@@ -254,15 +513,6 @@ public class HomePageFragment extends Fragment {
         pieChart.invalidate();
     }
 
-    /**
-     * Создаёт пользовательскую легенду для круговой диаграммы и размещает её в виде сетки строк с указанным количеством элементов в каждой.
-     *
-     * <p>Метод очищает переданный контейнер и динамически добавляет элементы легенды — цветовые маркеры с подписями —
-     * в горизонтальные ряды. При необходимости создаёт пустые невидимые элементы для выравнивания последнего ряда.</p>
-     *
-     * @param container Контейнер {@link LinearLayout}, в который будут добавлены ряды с элементами легенды.
-     * @param data Список объектов {@link ChartItem}, содержащих подписи и цвета для легенды.
-     */
     private void createCustomLegend(LinearLayout container, List<ChartItem> data) {
         // Очищаем контейнер
         container.removeAllViews();
@@ -305,16 +555,6 @@ public class HomePageFragment extends Fragment {
         }
     }
 
-    /**
-     * Создаёт новую горизонтальную строку {@link LinearLayout} для размещения элементов легенды.
-     *
-     * <p>Строка имеет ширину MATCH_PARENT и высоту WRAP_CONTENT, горизонтальную ориентацию,
-     * фиксированное количество элементов (weightSum) и вертикальные отступы по 8 пикселей сверху и снизу.</p>
-     *
-     * @param context Контекст приложения, необходимый для создания View.
-     * @param maxItemsPerRow Максимальное количество элементов, которое будет размещено в строке (используется для weightSum).
-     * @return Новый экземпляр {@link LinearLayout}, настроенный как горизонтальная строка.
-     */
     private LinearLayout createNewRow(Context context, int maxItemsPerRow) {
         LinearLayout row = new LinearLayout(context);
         row.setLayoutParams(new LinearLayout.LayoutParams(
@@ -327,22 +567,6 @@ public class HomePageFragment extends Fragment {
         return row;
     }
 
-    /**
-     * Создаёт элемент легенды для диаграммы с заданной меткой и цветом.
-     *
-     * <p>Элемент представляет собой View, созданный из layout `item_legend`,
-     * с текстовой меткой и цветным фоном. В зависимости от начала текста метки
-     * назначается обработчик клика, который заменяет текущий фрагмент на соответствующий
-     * раздел приложения (вклады, фонды, акции, валюта, крипта).</p>
-     *
-     * <p>Фон метки выполнен в виде прямоугольника с закруглёнными углами и заданным цветом.
-     * Элемент получает параметры ширины с весом для равномерного распределения в контейнере.</p>
-     *
-     * @param context Контекст, необходимый для создания View и доступа к ресурсам.
-     * @param label Текст метки элемента легенды (например, "Вклады 521 693 ₽").
-     * @param color Цвет фона метки в формате ARGB.
-     * @return View, представляющий элемент легенды с заданной меткой, цветом и обработчиком клика.
-     */
     private View createLegendItem(Context context, String label, int color) {
         // Создаем элемент через LayoutInflater (лучший способ)
         View itemView = LayoutInflater.from(context).inflate(R.layout.item_legend, null);
@@ -439,16 +663,7 @@ public class HomePageFragment extends Fragment {
         return itemView;
     }
 
-    /**
-     * Загружает данные из CSV-файла "portfolio_data.csv", расположенного во внутреннем хранилище приложения.
-     *
-     * <p>Файл должен содержать заголовок в первой строке и данные с двумя колонками: дата и значение.
-     * Метод читает не более 12313 строк данных (без учёта заголовка).
-     * Каждая строка преобразуется в объект {@link Entry}, где индекс позиции соответствует порядку строки,
-     * значение — из второй колонки, а дата — из первой колонки.</p>
-     *
-     * @return Список объектов {@link Entry}, загруженных из CSV-файла.
-     */
+
     private List<Entry> loadCsvFromInternalStorage() {
         List<Entry> entries = new ArrayList<>();
         File file = new File(requireContext().getFilesDir(), "portfolio_data.csv");
@@ -478,17 +693,7 @@ public class HomePageFragment extends Fragment {
         return entries;
     }
 
-    /**
-     * Настраивает и отображает линейный график с переданными данными.
-     *
-     * <p>Создаёт набор данных на основе списка {@link Entry}, форматирует его,
-     * конфигурирует внешний вид графика, осей и их форматирование.
-     * Устанавливает слушатель для взаимодействия с графиком и запускает анимацию.</p>
-     *
-     * @param lineChart   объект {@link LineChart}, который необходимо настроить и отобразить
-     * @param entries     список данных {@link Entry} для построения графика, где
-     *                    каждый элемент содержит координаты и дату
-     */
+
     private void setupLineChart(LineChart lineChart, List<Entry> entries) {
 
         // Создание набора данных

@@ -166,13 +166,13 @@ public class StockDBHelper extends SQLiteOpenHelper {
     private List<Stock> getSampleStocks() {
         ArrayList<Stock> stocks = new ArrayList<>();
 
-        stocks.add(new Stock("Банк ВТБ", "VTBR", 1512, 75.20, 93.59, "19.12.2024"));
-        stocks.add(new Stock("ФосАгро", "PHOR", 1242, 80.45, 72.30, "15.11.2024"));
-        stocks.add(new Stock("МТС", "MTSS", 1421, 68.75, 81.00, "10.01.2025"));
-        stocks.add(new Stock("ЛУКОЙЛ", "LKOH", 1012, 100.00, 90.00, "05.02.2025"));
+//        stocks.add(new Stock("Банк ВТБ", "VTBR", 1512, 75.20, 93.59, "19.12.2024"));
+//        stocks.add(new Stock("ФосАгро", "PHOR", 1242, 80.45, 72.30, "15.11.2024"));
+//        stocks.add(new Stock("МТС", "MTSS", 1421, 68.75, 81.00, "10.01.2025"));
+//        stocks.add(new Stock("ЛУКОЙЛ", "LKOH", 1012, 100.00, 90.00, "05.02.2025"));
         stocks.add(new Stock("Сбербанк", "SBER", 1375, 77.32, 93.59, "19.12.2024"));
-        stocks.add(new Stock("Яндекс", "YNDX", 1198, 85.00, 78.40, "01.03.2025"));
-        stocks.add(new Stock("Московская биржа", "MOEX", 1660, 70.00, 88.25, "25.12.2024"));
+//        stocks.add(new Stock("Яндекс", "YNDX", 1198, 85.00, 78.40, "01.03.2025"));
+//        stocks.add(new Stock("Московская биржа", "MOEX", 1660, 70.00, 88.25, "25.12.2024"));
 
         return stocks;
     }

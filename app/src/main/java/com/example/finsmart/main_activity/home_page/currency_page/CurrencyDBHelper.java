@@ -174,10 +174,10 @@ public class CurrencyDBHelper extends SQLiteOpenHelper {
     // Вспомогательный метод: создаём тестовые данные
     private List<Currency> getSampleCurrencies() {
         ArrayList<Currency> currencies = new ArrayList<>();
-        currencies.add(new Currency("Доллар США", "USD", '$', 100.0, 75.0, 74.8, "2024-01-15"));
-        currencies.add(new Currency("Евро", "EUR", '€', 50.0, 90.0, 89.5, "2024-02-10"));
-        currencies.add(new Currency("Фунт стерлингов ", "GBP", '£', 30.0, 100.0, 101.2, "2024-03-05"));
-        currencies.add(new Currency("Йена", "JPY", '¥', 10000.0, 0.65, 0.64, "2024-04-20"));
+        currencies.add(new Currency("Доллар США", "USD", '$', 3765.0, 75.0, 74.8, "2024-01-15"));
+//        currencies.add(new Currency("Евро", "EUR", '€', 50.0, 90.0, 89.5, "2024-02-10"));
+//        currencies.add(new Currency("Фунт стерлингов ", "GBP", '£', 30.0, 100.0, 101.2, "2024-03-05"));
+//        currencies.add(new Currency("Йена", "JPY", '¥', 10000.0, 0.65, 0.64, "2024-04-20"));
         return currencies;
     }
 }
