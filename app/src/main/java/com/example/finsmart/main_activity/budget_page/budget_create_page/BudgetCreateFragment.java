@@ -3,6 +3,7 @@ package com.example.finsmart.main_activity.budget_page.budget_create_page;
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.ViewModel;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -12,14 +13,16 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 
+import com.example.finsmart.MyApplication;
 import com.example.finsmart.R;
 import com.example.finsmart.data.database.AppDatabase;
 import com.example.finsmart.data.model.Budget;
 import com.example.finsmart.data.model.Category;
 import com.example.finsmart.data.provider.CategoryProvider;
 import com.example.finsmart.data.repository.AppRepository;
-import com.example.finsmart.main_activity.budget_page.SharedBudgetViewModel;
+import com.example.finsmart.main_activity.budget_page.BudgetCreationViewModel;
 import com.example.finsmart.main_activity.budget_page.BudgetUtils;
+import com.example.finsmart.main_activity.budget_page.SharedBudgetViewModelFactory;
 import com.example.finsmart.main_activity.budget_page.budget_confirm_page.BudgetConfirmFragment;
 
 import java.util.ArrayList;
@@ -49,7 +52,6 @@ public class BudgetCreateFragment extends Fragment {
 
         loadCategoriesRecyclerView();
 
-
         initUI();
 
         return view;
@@ -65,10 +67,11 @@ public class BudgetCreateFragment extends Fragment {
             updatedCategories.addAll(updatedIncomes);
             updatedCategories.addAll(updatedExpenses);
 
-            // Сохраняем их во ViewModel
-            SharedBudgetViewModel sharedBudgetViewModel = new ViewModelProvider(requireActivity())
-                    .get(SharedBudgetViewModel.class);
 
+            BudgetCreationViewModel sharedBudgetViewModel = new ViewModelProvider(requireActivity()).get(BudgetCreationViewModel.class);
+
+
+            // Сохраняем их во ViewModel
             sharedBudgetViewModel.setCategories(updatedCategories);
             sharedBudgetViewModel.setBudget(draftBudget);
 

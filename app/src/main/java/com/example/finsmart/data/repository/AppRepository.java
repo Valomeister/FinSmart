@@ -68,7 +68,7 @@ public class AppRepository {
         return budgetDao.insert(budget);
     }
 
-    public void insertBudgetWithCategories(Budget budget, List<Category> categories) {
+    public long insertBudgetWithCategories(Budget budget, List<Category> categories) {
         // Очистка БД
         database.clearAllTables();
         database.getOpenHelper().getWritableDatabase()
@@ -87,6 +87,8 @@ public class AppRepository {
         }
 
         categoryDao.insertAll(categories);
+
+        return budgetId;
     }
 
     public List<Budget> getAllBudgetsForUser(int userId) {
@@ -339,8 +341,6 @@ public class AppRepository {
             try {
                 // Очистка БД
                 database.clearAllTables();
-                database.getOpenHelper().getWritableDatabase()
-                        .execSQL("DELETE FROM sqlite_sequence");
 
                 User user = new User("Valery");
                 long userId = userDao.insert(user);
@@ -366,10 +366,10 @@ public class AppRepository {
                 }
 
                 // === Добавляем операции вручную для каждого дня ===
-                addOperationsForDay("2025-06-01", (int) budgetId, categoryDao, operationDao);
-                addOperationsForDay("2025-06-02", (int) budgetId, categoryDao, operationDao);
-                addOperationsForDay("2025-06-03", (int) budgetId, categoryDao, operationDao);
-                addOperationsForDay("2025-06-04", (int) budgetId, categoryDao, operationDao);
+                addOperationsForDay("2025-06-01", (int) budgetId);
+                addOperationsForDay("2025-06-02", (int) budgetId);
+                addOperationsForDay("2025-06-03", (int) budgetId);
+                addOperationsForDay("2025-06-04", (int) budgetId);
 
                 newBudgetId.postValue(budgetId);
 
@@ -383,9 +383,7 @@ public class AppRepository {
         return newBudgetId;
     }
 
-    private void addOperationsForDay(String date, int budgetId,
-                                     CategoryDao categoryDao,
-                                     OperationDao operationDao) {
+    public void addOperationsForDay(String date, int budgetId) {
 
         // Получаем все категории для этого бюджета
         List<Category> categories = categoryDao.getCategoriesByBudget(budgetId);
@@ -398,30 +396,66 @@ public class AppRepository {
         Category transport = getCategoryByName(categories, "Транспорт");
         Category salary = getCategoryByName(categories, "Зарплата");
         Category freelance = getCategoryByName(categories, "Фриланс");
+        Category entertainment = getCategoryByName(categories, "Развлечения");
+        Category clothes = getCategoryByName(categories, "Одежда");
+        Category communication = getCategoryByName(categories, "Связь");
+        Category investments = getCategoryByName(categories, "Вклады и облигации");
+        Category other = getCategoryByName(categories, "Другое");
 
         if ("2025-06-01".equals(date)) {
             operationDao.insert(new Operation(6000, rent.getCategoryId(), rent.getName(), date, "Арендодатель", FlowType.EXPENSE));
             operationDao.insert(new Operation(800, food.getCategoryId(), food.getName(), date, "Пятерочка", FlowType.EXPENSE));
             operationDao.insert(new Operation(150, transport.getCategoryId(), transport.getName(), date, "Лукойл", FlowType.EXPENSE));
-            operationDao.insert(new Operation(7000, salary.getCategoryId(), salary.getName(), date, "Завод", FlowType.INCOME));
+            operationDao.insert(new Operation(2500, entertainment.getCategoryId(), entertainment.getName(), date, "Кинотеатр", FlowType.EXPENSE));
+            operationDao.insert(new Operation(2000, clothes.getCategoryId(), clothes.getName(), date, "Zara", FlowType.EXPENSE));
+            operationDao.insert(new Operation(500, communication.getCategoryId(), communication.getName(), date, "МТС", FlowType.EXPENSE));
+            operationDao.insert(new Operation(69000, salary.getCategoryId(), salary.getName(), date, "Завод", FlowType.INCOME));
+            operationDao.insert(new Operation(3500, investments.getCategoryId(), investments.getName(), date, "Облигации", FlowType.INCOME));
         }
 
         else if ("2025-06-02".equals(date)) {
             operationDao.insert(new Operation(900, food.getCategoryId(), food.getName(), date, "Ресторан \"Хз вообще\"", FlowType.EXPENSE));
             operationDao.insert(new Operation(200, transport.getCategoryId(), transport.getName(), date, "МосТранспорт", FlowType.EXPENSE));
+            operationDao.insert(new Operation(1500, entertainment.getCategoryId(), entertainment.getName(), date, "Концерт", FlowType.EXPENSE));
             operationDao.insert(new Operation(5000, freelance.getCategoryId(), freelance.getName(), date, "FL.RU", FlowType.INCOME));
+            operationDao.insert(new Operation(2000, other.getCategoryId(), other.getName(), date, "Продажа вещей", FlowType.INCOME));
         }
 
         else if ("2025-06-03".equals(date)) {
             operationDao.insert(new Operation(1000, food.getCategoryId(), food.getName(), date, "Вкусно и точка", FlowType.EXPENSE));
             operationDao.insert(new Operation(300, transport.getCategoryId(), transport.getName(), date, "МосГосПарковка", FlowType.EXPENSE));
+            operationDao.insert(new Operation(5200, clothes.getCategoryId(), clothes.getName(), date, "H&M", FlowType.EXPENSE));
+            operationDao.insert(new Operation(1500, communication.getCategoryId(), communication.getName(), date, "Билайн", FlowType.EXPENSE));
             operationDao.insert(new Operation(2000, salary.getCategoryId(), salary.getName(), date, "Завод", FlowType.INCOME));
+            operationDao.insert(new Operation(1850, investments.getCategoryId(), investments.getName(), date, "Дивиденды", FlowType.INCOME));
         }
 
         else if ("2025-06-04".equals(date)) {
             operationDao.insert(new Operation(1200, food.getCategoryId(), food.getName(), date, "ВкусВилл", FlowType.EXPENSE));
             operationDao.insert(new Operation(100, transport.getCategoryId(), transport.getName(), date, "МосТранспорт", FlowType.EXPENSE));
+            operationDao.insert(new Operation(800, entertainment.getCategoryId(), entertainment.getName(), date, "Боулинг", FlowType.EXPENSE));
             operationDao.insert(new Operation(4000, freelance.getCategoryId(), freelance.getName(), date, "Фриланс", FlowType.INCOME));
+            operationDao.insert(new Operation(1500, other.getCategoryId(), other.getName(), date, "Подарок", FlowType.INCOME));
+        }
+
+        else if ("2025-06-05".equals(date)) {
+            operationDao.insert(new Operation(6000, rent.getCategoryId(), rent.getName(), date, "Арендодатель", FlowType.EXPENSE));
+            operationDao.insert(new Operation(1500, food.getCategoryId(), food.getName(), date, "Азбука Вкуса", FlowType.EXPENSE));
+            operationDao.insert(new Operation(400, transport.getCategoryId(), transport.getName(), date, "Такси", FlowType.EXPENSE));
+            operationDao.insert(new Operation(3000, clothes.getCategoryId(), clothes.getName(), date, "Massimo Dutti", FlowType.EXPENSE));
+            operationDao.insert(new Operation(2000, entertainment.getCategoryId(), entertainment.getName(), date, "Театр", FlowType.EXPENSE));
+            operationDao.insert(new Operation(500, communication.getCategoryId(), communication.getName(), date, "Теле2", FlowType.EXPENSE));
+            operationDao.insert(new Operation(25000, salary.getCategoryId(), salary.getName(), date, "Завод", FlowType.INCOME));
+            operationDao.insert(new Operation(4500, investments.getCategoryId(), investments.getName(), date, "Купонный доход", FlowType.INCOME));
+        }
+
+        else if ("2025-06-06".equals(date)) {
+            operationDao.insert(new Operation(700, food.getCategoryId(), food.getName(), date, "Перекресток", FlowType.EXPENSE));
+            operationDao.insert(new Operation(250, transport.getCategoryId(), transport.getName(), date, "Электрозаправка", FlowType.EXPENSE));
+            operationDao.insert(new Operation(3500, entertainment.getCategoryId(), entertainment.getName(), date, "Путешествие", FlowType.EXPENSE));
+            operationDao.insert(new Operation(1800, clothes.getCategoryId(), clothes.getName(), date, "Adidas", FlowType.EXPENSE));
+            operationDao.insert(new Operation(8000, freelance.getCategoryId(), freelance.getName(), date, "Веб-разработка", FlowType.INCOME));
+            operationDao.insert(new Operation(3000, other.getCategoryId(), other.getName(), date, "Возврат долга", FlowType.INCOME));
         }
     }
 

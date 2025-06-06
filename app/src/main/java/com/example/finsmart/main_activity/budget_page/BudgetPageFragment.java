@@ -60,14 +60,10 @@ public class BudgetPageFragment extends Fragment {
 
         viewModel = new ViewModelProvider(this, factory).get(SharedBudgetViewModel.class);
 
-
-
         createBudgetIllustration = view.findViewById(R.id.createBudgetIllustration);
         budgetDescriptionTextView = view.findViewById(R.id.budgetDescription);
         BudgetPieChart = view.findViewById(R.id.BudgetPieChart);
         budgetActionButton = view.findViewById(R.id.budgetActionButton);
-
-
 
         loadBudgetSection();
 
@@ -102,8 +98,6 @@ public class BudgetPageFragment extends Fragment {
                     .addToBackStack("BudgetPageFragmentTag")  // добавляем в back stack (чтобы можно было вернуться)
                     .commit();
         });
-
-
     }
 
     void loadExistingBudgetInfo(String month) {
@@ -127,7 +121,6 @@ public class BudgetPageFragment extends Fragment {
                         setupPieChart(categories);
             });
         });
-
     }
 
     private void setupPieChart(List<Category> expenseCategories) {

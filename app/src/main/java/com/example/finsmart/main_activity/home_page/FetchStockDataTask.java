@@ -101,14 +101,6 @@ public class FetchStockDataTask extends AsyncTask<Void, Void, String> {
             // Сортировка по дате (если нужно)
             list.sort(Comparator.comparing(StockDataPoint::getDate));
 
-            // Заполнение пропусков
-
-//            for (StockDataPoint dp : filledData) {
-//
-//                Log.d("stockFetch", dp.getDate() + "; " + String.valueOf(dp.getClosePrice()));
-//            }
-
-
         } catch (JSONException e) {
             Log.e("JSON_PARSE", "Ошибка парсинга JSON", e);
         }
@@ -116,36 +108,5 @@ public class FetchStockDataTask extends AsyncTask<Void, Void, String> {
     }
 
 
-//    private List<StockDataPoint> parseJsonAndReturnList(String jsonData) {
-//        List<StockDataPoint> list = new ArrayList<>();
-//        try {
-//            JSONObject jsonObject = new JSONObject(jsonData);
-//            JSONObject history = jsonObject.getJSONObject("history");
-//            JSONArray columns = history.getJSONArray("columns");
-//            JSONArray data = history.getJSONArray("data");
-//
-//            int tradeDateIndex = -1;
-//            int closeIndex = -1;
-//
-//            for (int i = 0; i < columns.length(); i++) {
-//                String columnName = columns.getString(i);
-//                if ("TRADEDATE".equals(columnName)) tradeDateIndex = i;
-//                else if ("CLOSE".equals(columnName)) closeIndex = i;
-//            }
-//
-//            if (tradeDateIndex == -1 || closeIndex == -1) return list;
-//
-//            for (int i = 0; i < data.length(); i++) {
-//                JSONArray row = data.getJSONArray(i);
-//                String date = row.getString(tradeDateIndex);
-//                double price = row.getDouble(closeIndex);
-//                Log.d("stockFetch", date + "; " + String.valueOf(price));
-//                list.add(new StockDataPoint(date, price));
-//            }
-//
-//        } catch (JSONException e) {
-//            Log.e("JSON_PARSE", "Ошибка парсинга JSON", e);
-//        }
-//        return list;
-//    }
+
 }

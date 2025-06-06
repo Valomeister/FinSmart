@@ -31,19 +31,19 @@ public class MyApplication extends Application {
                 database
         );
 
-        repository.createDefaultBudget(BudgetUtils.getCurrentMonth());
-
+//        repository.createDefaultBudget(BudgetUtils.getCurrentMonth());
+        repository.removeDataFromDatabase();
         // вызываем данные 1 раз для кэширования
-        LiveData<Budget> budgetLiveData = repository.getBudgetByMonth(BudgetUtils.getCurrentMonth());
-        budgetLiveData.observeForever(budget -> {
-            if (budget != null) {
-                int budgetId = budget.getBudgetId();
-                // вызываем данные 1 раз для кэширования
-                repository.getExpenseCategoriesByBudget(budgetId);
-            } else {
-
-            }
-        });
+//        LiveData<Budget> budgetLiveData = repository.getBudgetByMonth(BudgetUtils.getCurrentMonth());
+//        budgetLiveData.observeForever(budget -> {
+//            if (budget != null) {
+//                int budgetId = budget.getBudgetId();
+//                // вызываем данные 1 раз для кэширования
+//                repository.getExpenseCategoriesByBudget(budgetId);
+//            } else {
+//
+//            }
+//        });
 
 
     }

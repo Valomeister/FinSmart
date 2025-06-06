@@ -77,33 +77,14 @@ public class HomePageFragment extends Fragment {
     LineChart lineChart;
     private boolean isAnimationRunning = false;
     View view;
-
-    private SharedViewModel viewModel;
-
-    @Override
-    public void onCreate(@Nullable Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        viewModel = new ViewModelProvider(requireActivity()).get(SharedViewModel.class);
-
-
-    }
-
-
-    /**
-     * Создает и возвращает иерархию View, связанную с фрагментом.
-     *
-     * @param inflater           Объект LayoutInflater, используемый для раздувания XML-макета.
-     * @param container          Родительский View, к которому будет прикреплен фрагмент.
-     * @param savedInstanceState Если фрагмент восстанавливается, содержит его предыдущие состояния.
-     * @return Корневой View созданного макета фрагмента.
-     */
+        private SharedViewModel viewModel;
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        // TODO: 28.05.2025 Сделать кликабельными фиол. надписи (за все вермя, в рублях и тд) 
 
-        // Inflate the layout for this fragment
         view = inflater.inflate(R.layout.fragment_home_page, container, false);
+
+        viewModel = new ViewModelProvider(requireActivity()).get(SharedViewModel.class);
 
         // переносим .csv с данными графика во внутренне хранилище устройства
         FileUtils.copyPortfolioDataIfNeeded(requireContext());
@@ -198,7 +179,7 @@ public class HomePageFragment extends Fragment {
             printPortfolioValueMap(portfolioValueMap);
 
             viewModel.setPortfolioData(entries);
-        }, 5000); // подождать, пока все данные загрузятся
+        }, 10000); // подождать, пока все данные загрузятся
 
     }
 
@@ -207,7 +188,7 @@ public class HomePageFragment extends Fragment {
                                 Map<String, Double> portfolioValueMap) {
         Log.d("fetching", "fetchStockData started");
         String[] urls = {
-                "https://iss.moex.com/iss/history/engines/stock/markets/shares/securities/SBER.json?from=2024-06-06&till=2024-08-04",
+                "https://iss.moex.com/iss/history/engines/stock/markets/shares/securities/SBER.json?from=2024-06-07&till=2024-08-04",
                 "https://iss.moex.com/iss/history/engines/stock/markets/shares/securities/SBER.json?from=2024-08-05&till=2024-10-04",
                 "https://iss.moex.com/iss/history/engines/stock/markets/shares/securities/SBER.json?from=2024-10-05&till=2024-12-04",
                 "https://iss.moex.com/iss/history/engines/stock/markets/shares/securities/SBER.json?from=2024-12-05&till=2025-02-04",
@@ -272,8 +253,8 @@ public class HomePageFragment extends Fragment {
         // Начальная и конечная дата
         String startDateStr = originalData.get(0).getDate();
         String endDateStr = originalData.get(originalData.size()-1).getDate();
-        if (Objects.equals(endDateStr, "2025-06-04")) {
-            endDateStr = "2025-06-05";
+        if (Objects.equals(endDateStr, "2025-06-05")) {
+            endDateStr = "2025-06-06";
         }
 
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
@@ -344,7 +325,7 @@ public class HomePageFragment extends Fragment {
                                    Map<String, Double> portfolioValueMap) {
         Log.d("fetching", "fetchCurrencyData started");
 
-        String currencyUrl = "https://www.cbr.ru/scripts/XML_dynamic.asp?date_req1=06.06.2024&date_req2=05.06.2025&VAL_NM_RQ=R01235";
+        String currencyUrl = "https://www.cbr.ru/scripts/XML_dynamic.asp?date_req1=07.06.2024&date_req2=05.06.2025&VAL_NM_RQ=R01235";
 
         new FetchCurrencyDataTask(currencyUrl, data -> {
             for (CurrencyDataPoint point : data) {

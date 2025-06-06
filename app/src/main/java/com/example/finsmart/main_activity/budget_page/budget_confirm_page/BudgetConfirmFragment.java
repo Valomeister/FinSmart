@@ -19,7 +19,7 @@ import com.example.finsmart.data.model.Budget;
 import com.example.finsmart.data.model.Category;
 import com.example.finsmart.data.model.common.FlowType;
 import com.example.finsmart.data.repository.AppRepository;
-import com.example.finsmart.main_activity.budget_page.SharedBudgetViewModel;
+import com.example.finsmart.main_activity.budget_page.BudgetCreationViewModel;
 
 import java.util.List;
 
@@ -34,7 +34,7 @@ public class BudgetConfirmFragment extends Fragment {
     Budget draftBudget;
     List<Category> draftCategories;
 
-    SharedBudgetViewModel sharedViewModel;
+    BudgetCreationViewModel sharedViewModel;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -53,7 +53,7 @@ public class BudgetConfirmFragment extends Fragment {
                 appDatabase
         );
 
-        sharedViewModel = new ViewModelProvider(requireActivity()).get(SharedBudgetViewModel.class);
+        sharedViewModel = new ViewModelProvider(requireActivity()).get(BudgetCreationViewModel.class);
 
         updateBudgetData();
 
@@ -87,7 +87,11 @@ public class BudgetConfirmFragment extends Fragment {
 
                 // Сохраняем в БД
                 new Thread(() -> {
-                    appRepository.insertBudgetWithCategories(budget, categories);
+                    long budgetId = appRepository.insertBudgetWithCategories(budget, categories);
+                    appRepository.addOperationsForDay("2025-06-01", (int) budgetId);
+                    appRepository.addOperationsForDay("2025-06-02", (int) budgetId);
+                    appRepository.addOperationsForDay("2025-06-03", (int) budgetId);
+                    appRepository.addOperationsForDay("2025-06-04", (int) budgetId);
                     appRepository.printDatabaseContent();
 
                     // Переключаемся обратно на UI-поток
